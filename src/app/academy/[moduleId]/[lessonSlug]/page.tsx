@@ -4,7 +4,7 @@ import { getLesson, getModules } from "@/lib/sanity";
 import { redirect, notFound } from "next/navigation";
 import { Sidebar } from "@/components/academy/Sidebar";
 import { MarkCompleteButton } from "@/components/academy/MarkCompleteButton";
-import { PortableText } from "next-sanity";
+import { LessonContent } from "@/components/academy/LessonContent";
 import { Lock } from "lucide-react";
 import Link from "next/link";
 
@@ -114,8 +114,8 @@ export default async function LessonPage({ params }: Props) {
             </div>
 
             {lesson.content && (
-              <div className="article-body mt-10">
-                <PortableText value={lesson.content} />
+              <div className="mt-10">
+                <LessonContent content={lesson.content as import("@portabletext/types").TypedObject[]} />
               </div>
             )}
           </div>
