@@ -1,0 +1,67 @@
+---
+title: "Run LLMs Locally with Ollama: The Complete Setup Guide"
+excerpt: "Stop paying per token. Run Llama 3, Mistral, and Gemma locally — free, fast, and private."
+date: "2026-05-14"
+tags: ["Ollama", "Local LLMs", "Llama"]
+coverImage: "https://images.unsplash.com/photo-1620712943543-bcc4688e7485?w=800&auto=format&fit=crop"
+---
+
+Running LLMs locally used to require a PhD and a server rack. Ollama changed that — it's a one-command install that runs Llama 3, Mistral, Gemma, and 50+ other models on your laptop.
+
+## Installation
+
+```bash
+# macOS / Linux
+curl -fsSL https://ollama.com/install.sh | sh
+
+# Pull a model
+ollama pull llama3.2
+ollama pull mistral
+ollama pull gemma2
+
+# Run it
+ollama run llama3.2
+```
+
+That's it. You now have a local LLM running with an OpenAI-compatible API at `http://localhost:11434`.
+
+## Connecting to LangChain
+
+```python
+from langchain_community.llms import Ollama
+from langchain_core.prompts import ChatPromptTemplate
+
+llm = Ollama(model="llama3.2", temperature=0.1)
+
+prompt = ChatPromptTemplate.from_template(
+    "You are an expert AI engineer. Answer concisely: {question}"
+)
+
+chain = prompt | llm
+response = chain.invoke({"question": "What is the attention mechanism?"})
+print(response)
+```
+
+## Streaming Responses
+
+For a production chat UI you need streaming. Ollama supports it natively:
+
+```python
+for chunk in llm.stream("Explain transformers in 3 sentences"):
+    print(chunk, end="", flush=True)
+```
+
+## Which Model Should You Use?
+
+| Task | Model | VRAM |
+|------|-------|------|
+| Chat / Q&A | llama3.2:3b | 4GB |
+| Code generation | qwen2.5-coder | 8GB |
+| Long context | gemma2:9b | 8GB |
+| Best quality | llama3.1:70b | 48GB |
+
+For most development work on a MacBook with 16GB RAM, `llama3.2:3b` gives the best speed/quality balance.
+
+## This is Lesson 1 of Module M1
+
+The full lesson includes streaming, conversation memory, and tool use — plus a capstone project where you build a complete local chat app. Available in the academy.

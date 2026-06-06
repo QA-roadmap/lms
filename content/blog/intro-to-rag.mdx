@@ -1,0 +1,48 @@
+---
+title: "Building Your First RAG Pipeline in 30 Minutes"
+excerpt: "Retrieval-Augmented Generation is the backbone of production AI apps. Here's how to build one that actually works."
+date: "2026-05-28"
+tags: ["RAG", "LangChain", "Vector Databases"]
+coverImage: "https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=800&auto=format&fit=crop"
+---
+
+Retrieval-Augmented Generation (RAG) lets your LLM answer questions based on your own documents — without fine-tuning, without hallucination, without storing everything in the context window.
+
+## Why RAG?
+
+The classic problem: you have a 500-page technical manual. You want to ask questions about it. You can't fit it all in the prompt. Fine-tuning is expensive and slow.
+
+RAG solves this by splitting the document into chunks, embedding them, storing them in a vector database, and retrieving only the relevant chunks at query time.
+
+## The Basic Architecture
+
+```python
+# 1. Load and chunk your documents
+from langchain.text_splitter import RecursiveCharacterTextSplitter
+
+splitter = RecursiveCharacterTextSplitter(chunk_size=512, chunk_overlap=64)
+chunks = splitter.split_documents(docs)
+
+# 2. Embed and store
+from langchain_community.vectorstores import Chroma
+from langchain_openai import OpenAIEmbeddings
+
+vectorstore = Chroma.from_documents(chunks, OpenAIEmbeddings())
+
+# 3. Retrieve and generate
+retriever = vectorstore.as_retriever(search_kwargs={"k": 4})
+chain = RetrievalQA.from_chain_type(llm=llm, retriever=retriever)
+answer = chain.invoke("What is the maximum payload size?")
+```
+
+## What Most Tutorials Miss
+
+**Chunking strategy matters more than the model.** A 512-token chunk with 64-token overlap is a starting point — but for code documentation you might want 256 tokens, for legal text you might want 1024.
+
+**Reranking doubles your accuracy.** After retrieval, run a cross-encoder reranker (Cohere, BGE) to re-score the candidates. This adds ~100ms but significantly improves relevance.
+
+**Evaluate before you ship.** Use RAGAS to measure faithfulness, answer relevancy, and context precision. Your RAG pipeline isn't production-ready until you have baseline metrics.
+
+## Next Steps
+
+In Module M2 of the academy we cover all of this in depth — including hybrid search (combining semantic + keyword), evaluation with RAGAS, and deploying to production with proper observability.
