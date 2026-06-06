@@ -7,6 +7,27 @@ import Image from "next/image";
 
 import type { TypedObject } from "@portabletext/types";
 
+// Converts any YouTube URL format to an embed URL
+function toYouTubeEmbed(url: string): string | null {
+  try {
+    const u = new URL(url);
+    let videoId: string | null = null;
+
+    if (u.hostname === "youtu.be") {
+      videoId = u.pathname.slice(1);
+    } else if (u.hostname.includes("youtube.com")) {
+      if (u.pathname.startsWith("/embed/")) {
+        return url; // already an embed URL
+      }
+      videoId = u.searchParams.get("v");
+    }
+
+    return videoId ? `https://www.youtube.com/embed/${videoId}` : null;
+  } catch {
+    return null;
+  }
+}
+
 type Props = {
   content: TypedObject[];
 };
@@ -40,11 +61,13 @@ const components = {
 
     youtube: ({ value }: { value: { url: string } }) => {
       if (!value?.url) return null;
+      const embedUrl = toYouTubeEmbed(value.url);
+      if (!embedUrl) return null;
       return (
         <div className="my-6 overflow-hidden rounded-xl border border-zinc-800">
           <div className="relative w-full" style={{ paddingBottom: "56.25%" }}>
             <iframe
-              src={value.url}
+              src={embedUrl}
               className="absolute inset-0 h-full w-full"
               allowFullScreen
               allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
