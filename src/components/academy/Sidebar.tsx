@@ -2,27 +2,28 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { MODULES } from "@/data/curriculum";
 import { clsx } from "clsx";
 import { CheckCircle, Circle, Lock, ChevronDown } from "lucide-react";
 import { useState } from "react";
+import type { SanityModule } from "@/types/sanity";
 
 type Props = {
+  modules: SanityModule[];
   completedSlugs: string[];
   hasAccess: boolean;
 };
 
-export function Sidebar({ completedSlugs, hasAccess }: Props) {
+export function Sidebar({ modules, completedSlugs, hasAccess }: Props) {
   const pathname = usePathname();
   const [openModule, setOpenModule] = useState<string | null>(
-    MODULES[0]?.id ?? null
+    modules[0]?._id ?? null
   );
 
   return (
     <aside className="flex h-full w-72 shrink-0 flex-col border-r border-zinc-800 bg-zinc-900">
       <div className="border-b border-zinc-800 px-5 py-4">
         <Link href="/" className="text-sm font-bold text-white">
-          AI<span className="text-blue-500">Expert</span>
+          API<span className="text-blue-500">Course</span>
         </Link>
         <Link
           href="/academy"
@@ -33,11 +34,11 @@ export function Sidebar({ completedSlugs, hasAccess }: Props) {
       </div>
 
       <nav className="flex-1 overflow-y-auto py-3">
-        {MODULES.map((mod) => (
-          <div key={mod.id}>
+        {modules.map((mod) => (
+          <div key={mod._id}>
             <button
               onClick={() =>
-                setOpenModule(openModule === mod.id ? null : mod.id)
+                setOpenModule(openModule === mod._id ? null : mod._id)
               }
               className="flex w-full items-center justify-between px-5 py-2.5 text-left"
             >
@@ -52,14 +53,14 @@ export function Sidebar({ completedSlugs, hasAccess }: Props) {
               <ChevronDown
                 className={clsx(
                   "h-3.5 w-3.5 text-zinc-600 transition-transform",
-                  openModule === mod.id && "rotate-180"
+                  openModule === mod._id && "rotate-180"
                 )}
               />
             </button>
 
-            {openModule === mod.id && (
+            {openModule === mod._id && (
               <ul className="pb-2">
-                {mod.lessons.map((lesson) => {
+                {(mod.lessons ?? []).map((lesson) => {
                   const isCompleted = completedSlugs.includes(lesson.slug);
                   const isActive = pathname.includes(lesson.slug);
                   const isLocked = !lesson.isFree && !hasAccess;
@@ -73,7 +74,7 @@ export function Sidebar({ completedSlugs, hasAccess }: Props) {
                         </span>
                       ) : (
                         <Link
-                          href={`/academy/${mod.id}/${lesson.slug}`}
+                          href={`/academy/${mod._id}/${lesson.slug}`}
                           className={clsx(
                             "flex items-center gap-3 px-5 py-2 text-xs transition-colors",
                             isActive
