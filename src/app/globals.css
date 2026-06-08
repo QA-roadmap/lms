@@ -91,7 +91,8 @@ body {
   font-style: normal;
 }
 
-/* Inline code */
+/* Inline code — ligatures off: Geist Mono otherwise fuses sequences like "--" or "->"
+   into combined glyphs, which misrepresents the actual characters in code/CLI examples */
 .article-body code {
   background: #27272a;
   color: #93c5fd; /* blue-300 */
@@ -99,6 +100,8 @@ body {
   border-radius: 0.3rem;
   font-size: 0.875em;
   font-family: var(--font-geist-mono), monospace;
+  font-variant-ligatures: none;
+  font-feature-settings: "liga" 0, "calt" 0;
 }
 
 /* Code blocks */
@@ -116,6 +119,8 @@ body {
   padding: 0;
   font-size: 0.875rem;
   line-height: 1.7;
+  font-variant-ligatures: none;
+  font-feature-settings: "liga" 0, "calt" 0;
 }
 
 /* HR */
@@ -154,3 +159,59 @@ body {
   border: 1px solid #3f3f46;
   max-width: 100%;
 }
+
+/* ─── Skill guide — richer technical-doc prose (layers on .article-body) ─ */
+
+.guide-body h2 {
+  padding-bottom: 0.6em;
+  border-bottom: 1px solid #27272a;
+}
+
+.guide-body h3 {
+  margin-top: 1.85em;
+  color: #7dd3fc; /* sky-300 — visually separates sub-sections (e.g. STLC phases) from h2 */
+}
+
+.guide-body hr {
+  height: 1px;
+  background: linear-gradient(to right, transparent, #3f3f46 15%, #3f3f46 85%, transparent);
+  margin: 2.75em 0;
+}
+
+.guide-body blockquote {
+  border-radius: 0.625rem;
+  background: linear-gradient(to right, rgba(59, 130, 246, 0.09), rgba(59, 130, 246, 0.015));
+}
+.guide-body blockquote > p {
+  margin: 0;
+}
+
+/* Tables: rounded bordered container, calmer header, subtle row hover */
+.guide-body table {
+  border: 1px solid #3f3f46;
+  border-radius: 0.75rem;
+  border-collapse: separate;
+  border-spacing: 0;
+  overflow: hidden;
+}
+.guide-body th:empty {
+  background: transparent;
+  padding-top: 0.3em;
+  padding-bottom: 0.3em;
+}
+.guide-body tbody tr:hover td {
+  background: rgba(255, 255, 255, 0.025);
+  transition: background-color 0.15s ease;
+}
+
+/* Fenced code blocks without a language (rehype-pretty-code leaves these untouched —
+   no [data-language]) — ASCII diagrams, flow sketches — read as reference text rather
+   than syntax-highlighted code */
+.guide-body pre:not([data-language]) {
+  background: #161619;
+  border-style: dashed;
+}
+.guide-body pre:not([data-language]) code {
+  color: #a1a1aa;
+}
+

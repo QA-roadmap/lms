@@ -2,6 +2,7 @@ import { getPost, getAllPosts, formatDate } from "@/lib/blog";
 import { Navbar } from "@/components/marketing/Navbar";
 import { Footer } from "@/components/marketing/Footer";
 import { MDXRemote } from "next-mdx-remote/rsc";
+import { mdxOptions } from "@/lib/mdx";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
@@ -84,7 +85,7 @@ export default async function BlogPostPage({ params }: Props) {
         )}
 
         <div className="article-body mt-10">
-          <MDXRemote source={post.content} />
+          <MDXRemote source={post.content} options={mdxOptions} />
         </div>
       </main>
 
