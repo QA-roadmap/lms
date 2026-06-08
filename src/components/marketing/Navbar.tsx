@@ -9,21 +9,21 @@ export async function Navbar() {
     <header className="sticky top-0 z-50 border-b border-zinc-800 bg-zinc-950/80 backdrop-blur-sm">
       <nav className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4">
         <Link href="/" className="text-lg font-bold tracking-tight text-white">
-          AI<span className="text-blue-500">Expert</span>
+          QA<span className="text-blue-500">Roadmap</span>
         </Link>
 
         <div className="hidden items-center gap-8 sm:flex">
           <Link
-            href="/#curriculum"
+            href="/courses"
             className="text-sm text-zinc-400 hover:text-white transition-colors"
           >
-            Curriculum
+            Курси
           </Link>
           <Link
-            href="/#pricing"
+            href="/skills"
             className="text-sm text-zinc-400 hover:text-white transition-colors"
           >
-            Pricing
+            Скіли
           </Link>
           <Link
             href="/#faq"
@@ -35,7 +35,7 @@ export async function Navbar() {
             href="/blog"
             className="text-sm text-zinc-400 hover:text-white transition-colors"
           >
-            Blog
+            Блог
           </Link>
         </div>
 
@@ -46,7 +46,7 @@ export async function Navbar() {
                 href="/academy"
                 className="text-sm text-zinc-400 hover:text-white transition-colors"
               >
-                Academy
+                Кабінет
               </Link>
               <SignOutButton />
             </>
@@ -55,7 +55,7 @@ export async function Navbar() {
               href="/sign-in"
               className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-500 transition-colors"
             >
-              Sign In
+              Увійти
             </Link>
           )}
         </div>

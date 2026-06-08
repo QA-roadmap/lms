@@ -1,24 +1,24 @@
 const TESTIMONIALS = [
   {
     quote:
-      "Best educational investment in my AI/ML journey. The projects are immediately applicable to real-world scenarios — I shipped a RAG system to prod on week 3.",
-    name: "Ana Clara Medeiros",
-    title: "AI Developer @ Nubank",
-    initials: "AC",
+      "Найкраща інвестиція в кар'єру. Вже на третьому тижні я писала перші тест-кейси, а через два місяці після курсу отримала офер на позицію QA Engineer.",
+    name: "Олена Ткаченко",
+    title: "QA Engineer @ Genesis",
+    initials: "ОТ",
   },
   {
     quote:
-      "I've taken a dozen ML courses. This is the only one that actually taught me what production looks like. The MLOps module alone was worth the price.",
-    name: "David Park",
-    title: "Senior Engineer @ Stripe",
-    initials: "DP",
+      "Пройшов з десяток курсів з тестування. Це єдиний, де реально показують, як працює QA в продуктовій команді — баг-репорти, регресія, робота з розробниками.",
+    name: "Андрій Мельник",
+    title: "Senior QA Engineer @ EPAM",
+    initials: "АМ",
   },
   {
     quote:
-      "The agent architecture section completely changed how I think about building with LLMs. Went from hacking scripts to designing real systems.",
-    name: "Yuliya Kovalenko",
-    title: "ML Engineer @ Grammarly",
-    initials: "YK",
+      "Модуль з автоматизації повністю змінив мій підхід до тестування. Перейшла від ручних чек-листів до власних тестових фреймворків на Playwright.",
+    name: "Юлія Коваленко",
+    title: "QA Automation Engineer @ Grammarly",
+    initials: "ЮК",
   },
 ];
 
@@ -28,10 +28,10 @@ export function Testimonials() {
       <div className="mx-auto max-w-5xl">
         <div className="mb-12 text-center">
           <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
-            Engineers Love It
+            QA-спеціалісти обирають нас
           </h2>
           <p className="mt-4 text-zinc-400">
-            From solo devs to engineers at top-tier companies
+            Від новачків без досвіду до тестувальників у топових продуктових командах
           </p>
         </div>
 

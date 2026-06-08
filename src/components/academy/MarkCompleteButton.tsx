@@ -5,12 +5,13 @@ import { useRouter } from "next/navigation";
 import { CheckCircle, Circle } from "lucide-react";
 
 type Props = {
+  courseSlug: string;
   lessonSlug: string;
   userId: string;
   isCompleted: boolean;
 };
 
-export function MarkCompleteButton({ lessonSlug, isCompleted }: Props) {
+export function MarkCompleteButton({ courseSlug, lessonSlug, isCompleted }: Props) {
   const [completed, setCompleted] = useState(isCompleted);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
@@ -21,7 +22,7 @@ export function MarkCompleteButton({ lessonSlug, isCompleted }: Props) {
       await fetch("/api/progress", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ lessonSlug, completed: !completed }),
+        body: JSON.stringify({ courseSlug, lessonSlug, completed: !completed }),
       });
       setCompleted(!completed);
       router.refresh();

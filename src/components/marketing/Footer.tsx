@@ -7,28 +7,28 @@ export function Footer() {
         <div className="flex flex-col items-center justify-between gap-6 sm:flex-row">
           <div>
             <Link href="/" className="text-lg font-bold text-white">
-              AI<span className="text-blue-500">Expert</span>
+              QA<span className="text-blue-500">Roadmap</span>
             </Link>
             <p className="mt-1 text-xs text-zinc-600">
-              © {new Date().getFullYear()} AIExpert Academy. All rights reserved.
+              © {new Date().getFullYear()} QA Roadmap. Усі права захищено.
             </p>
           </div>
 
           <nav className="flex flex-wrap gap-6 text-sm text-zinc-500">
-            <Link href="/#curriculum" className="hover:text-white transition-colors">
-              Curriculum
+            <Link href="/courses" className="hover:text-white transition-colors">
+              Курси
             </Link>
-            <Link href="/#pricing" className="hover:text-white transition-colors">
-              Pricing
+            <Link href="/skills" className="hover:text-white transition-colors">
+              Скіли
             </Link>
             <Link href="/#faq" className="hover:text-white transition-colors">
               FAQ
             </Link>
             <Link href="/academy" className="hover:text-white transition-colors">
-              Academy
+              Кабінет
             </Link>
-            <a href="mailto:support@aiexpert.dev" className="hover:text-white transition-colors">
-              Contact
+            <a href="mailto:support@qaroadmap.dev" className="hover:text-white transition-colors">
+              Контакти
             </a>
           </nav>
         </div>

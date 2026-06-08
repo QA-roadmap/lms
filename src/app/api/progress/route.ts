@@ -8,20 +8,23 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { lessonSlug, completed } = (await req.json()) as {
+  const { courseSlug, lessonSlug, completed } = (await req.json()) as {
+    courseSlug: string;
     lessonSlug: string;
     completed: boolean;
   };
 
   if (completed) {
     await db.userProgress.upsert({
-      where: { userId_lessonSlug: { userId: session.user.id, lessonSlug } },
-      create: { userId: session.user.id, lessonSlug },
+      where: {
+        userId_courseSlug_lessonSlug: { userId: session.user.id, courseSlug, lessonSlug },
+      },
+      create: { userId: session.user.id, courseSlug, lessonSlug },
       update: {},
     });
   } else {
     await db.userProgress.deleteMany({
-      where: { userId: session.user.id, lessonSlug },
+      where: { userId: session.user.id, courseSlug, lessonSlug },
     });
   }
 

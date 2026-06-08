@@ -8,12 +8,14 @@ import { useState } from "react";
 import type { SanityModule } from "@/types/sanity";
 
 type Props = {
+  courseSlug: string;
+  courseTitle: string;
   modules: SanityModule[];
   completedSlugs: string[];
   hasAccess: boolean;
 };
 
-export function Sidebar({ modules, completedSlugs, hasAccess }: Props) {
+export function Sidebar({ courseSlug, courseTitle, modules, completedSlugs, hasAccess }: Props) {
   const pathname = usePathname();
   const [openModule, setOpenModule] = useState<string | null>(
     modules[0]?._id ?? null
@@ -22,14 +24,14 @@ export function Sidebar({ modules, completedSlugs, hasAccess }: Props) {
   return (
     <aside className="flex h-full w-72 shrink-0 flex-col border-r border-zinc-800 bg-zinc-900">
       <div className="border-b border-zinc-800 px-5 py-4">
-        <Link href="/" className="text-sm font-bold text-white">
-          API<span className="text-blue-500">Course</span>
+        <Link href={`/academy/${courseSlug}`} className="text-sm font-semibold text-white">
+          {courseTitle}
         </Link>
         <Link
           href="/academy"
           className="mt-1 block text-xs text-zinc-500 hover:text-zinc-300"
         >
-          ← Dashboard
+          ← Усі курси
         </Link>
       </div>
 
@@ -74,7 +76,7 @@ export function Sidebar({ modules, completedSlugs, hasAccess }: Props) {
                         </span>
                       ) : (
                         <Link
-                          href={`/academy/${mod._id}/${lesson.slug}`}
+                          href={`/academy/${courseSlug}/${mod._id}/${lesson.slug}`}
                           className={clsx(
                             "flex items-center gap-3 px-5 py-2 text-xs transition-colors",
                             isActive

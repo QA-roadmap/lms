@@ -13,9 +13,9 @@ const geistMono = Geist_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "AIExpert Academy — Build AI Systems That Survive Production",
+  title: "QA Roadmap — курси з тестування ПЗ та автоматизації QA",
   description:
-    "A hands-on program for engineers who want to ship real AI systems. From local LLMs to RAG, agents, and MLOps.",
+    "Покрокові курси для тих, хто хоче побудувати кар'єру в QA — від основ ручного тестування до автоматизації на Selenium і Playwright.",
 };
 
 export default function RootLayout({
@@ -24,7 +24,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${geistSans.variable} ${geistMono.variable}`}>
+    <html lang="uk" className={`${geistSans.variable} ${geistMono.variable}`}>
       <body className="bg-zinc-950 antialiased">{children}</body>
     </html>
   );

@@ -2,11 +2,11 @@ import Link from "next/link";
 import { CheckCircle } from "lucide-react";
 
 const BENEFITS = [
-  "40+ hands-on tutorials",
-  "Source code for every project",
-  "Verifiable certificate",
-  "Discord community access",
-  "Lifetime updates included",
+  "40+ практичних уроків",
+  "Реальні чек-листи й тест-кейси",
+  "Сертифікат для резюме й LinkedIn",
+  "Доступ до спільноти в Discord",
+  "Довічний доступ і всі оновлення",
 ];
 
 export function Hero() {
@@ -18,34 +18,34 @@ export function Hero() {
         <div className="mb-6 inline-flex items-center gap-2 rounded-full border border-blue-500/30 bg-blue-500/10 px-4 py-1.5">
           <span className="h-1.5 w-1.5 rounded-full bg-blue-400" />
           <span className="text-xs font-medium text-blue-400">
-            855+ engineers enrolled
+            855+ людей вже навчаються QA
           </span>
         </div>
 
         <h1 className="text-4xl font-bold tracking-tight text-white sm:text-6xl sm:leading-tight">
-          Learn to Build{" "}
-          <span className="text-blue-500">AI Systems</span>
+          Твій{" "}
+          <span className="text-blue-500">роадмап у QA</span>
           <br />
-          that Survive Production
+          від першого тест-кейсу до автоматизації
         </h1>
 
         <p className="mx-auto mt-6 max-w-2xl text-lg leading-8 text-zinc-400">
-          A hands-on program for engineers who want to ship real AI systems —
-          not toy demos. From local LLMs to RAG, agents, and MLOps.
+          Покрокова програма для тих, хто хоче увійти в тестування або вийти на новий рівень —
+          ручне тестування, тест-дизайн, автоматизація та реальні проєкти в портфоліо.
         </p>
 
         <div className="mt-8 flex flex-col items-center gap-3 sm:flex-row sm:justify-center">
           <Link
-            href="/#pricing"
+            href="/courses"
             className="w-full rounded-xl bg-blue-600 px-8 py-4 text-base font-semibold text-white shadow-lg shadow-blue-600/20 hover:bg-blue-500 transition-colors sm:w-auto"
           >
-            Get Instant Access · from $39/mo
+            Переглянути курси
           </Link>
           <Link
-            href="/#curriculum"
+            href="/#faq"
             className="w-full rounded-xl border border-zinc-700 bg-zinc-800/50 px-8 py-4 text-base font-semibold text-zinc-300 hover:bg-zinc-800 transition-colors sm:w-auto"
           >
-            View Curriculum
+            Поширені запитання
           </Link>
         </div>
 
@@ -66,21 +66,19 @@ export function Hero() {
           <span className="h-3 w-3 rounded-full bg-green-500/60" />
         </div>
         <pre className="overflow-x-auto text-zinc-300">
-          <span className="text-zinc-500"># Build a RAG pipeline in minutes</span>{"\n"}
+          <span className="text-zinc-500"># Автотест форми логіну на Playwright</span>{"\n"}
           <span className="text-blue-400">from</span>{" "}
-          <span className="text-green-400">langchain</span>{" "}
-          <span className="text-blue-400">import</span> vectorstore, embeddings{"\n"}
-          <span className="text-blue-400">from</span>{" "}
-          <span className="text-green-400">app.rag</span>{" "}
-          <span className="text-blue-400">import</span> Pipeline{"\n\n"}
-          <span className="text-zinc-500"># Connect your vector store</span>{"\n"}
-          pipeline = Pipeline({"\n"}
-          {"  "}embeddings=<span className="text-yellow-400">OpenAIEmbeddings</span>(),{"\n"}
-          {"  "}retriever=<span className="text-yellow-400">vectorstore</span>.as_retriever(k=<span className="text-amber-400">5</span>),{"\n"}
-          {"  "}reranker=<span className="text-yellow-400">CohereReranker</span>(){"\n"}
-          ){"\n\n"}
-          result = pipeline.<span className="text-yellow-400">run</span>(<span className="text-green-400">&quot;How does attention work?&quot;</span>){"\n"}
-          <span className="text-zinc-500"># → Production-ready answer with sources</span>
+          <span className="text-green-400">playwright.sync_api</span>{" "}
+          <span className="text-blue-400">import</span> Page, expect{"\n\n"}
+          <span className="text-blue-400">def</span>{" "}
+          <span className="text-yellow-400">test_login_success</span>(page: Page):{"\n"}
+          {"  "}page.goto(<span className="text-green-400">&quot;https://app.example.com/login&quot;</span>){"\n"}
+          {"  "}page.fill(<span className="text-green-400">&quot;#email&quot;</span>, <span className="text-green-400">&quot;qa@example.com&quot;</span>){"\n"}
+          {"  "}page.fill(<span className="text-green-400">&quot;#password&quot;</span>, <span className="text-green-400">&quot;Sup3rSecret!&quot;</span>){"\n"}
+          {"  "}page.click(<span className="text-green-400">&quot;button[type=submit]&quot;</span>){"\n\n"}
+          {"  "}<span className="text-zinc-500"># Перевіряємо, що дашборд відкрився</span>{"\n"}
+          {"  "}expect(page.locator(<span className="text-green-400">&quot;.dashboard&quot;</span>)).to_be_visible(){"\n"}
+          <span className="text-zinc-500"># → 1 passed — баг не знайдено</span>
         </pre>
       </div>
     </section>

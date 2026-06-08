@@ -1,6 +1,7 @@
 import { auth } from "@/auth";
 import { db } from "@/lib/db";
-import { getLesson, getModules } from "@/lib/sanity";
+import { getActiveCourseSlugs } from "@/lib/access";
+import { getLesson, getCourseBySlug } from "@/lib/sanity";
 import { redirect, notFound } from "next/navigation";
 import { Sidebar } from "@/components/academy/Sidebar";
 import { MarkCompleteButton } from "@/components/academy/MarkCompleteButton";
@@ -9,40 +10,48 @@ import { Lock } from "lucide-react";
 import Link from "next/link";
 
 type Props = {
-  params: Promise<{ moduleId: string; lessonSlug: string }>;
+  params: Promise<{ courseSlug: string; moduleId: string; lessonSlug: string }>;
 };
 
 export default async function LessonPage({ params }: Props) {
-  const { moduleId, lessonSlug } = await params;
+  const { courseSlug, moduleId, lessonSlug } = await params;
   const session = await auth();
   if (!session?.user?.id) redirect("/sign-in");
 
-  const [lesson, modules, user] = await Promise.all([
+  const [lesson, course, activeCourseSlugs, progress] = await Promise.all([
     getLesson(lessonSlug),
-    getModules(),
-    db.user.findUnique({
-      where: { id: session.user.id },
-      include: { progress: true },
+    getCourseBySlug(courseSlug),
+    getActiveCourseSlugs(session.user.id),
+    db.userProgress.findMany({
+      where: { userId: session.user.id, courseSlug },
+      select: { lessonSlug: true },
     }),
   ]);
 
-  if (!lesson) notFound();
+  if (!lesson || !course) notFound();
 
-  const mod = modules.find((m: { _id: string }) => m._id === moduleId);
+  const mod = course.modules.find((m) => m._id === moduleId);
+  if (!mod) notFound();
 
-  const hasAccess = user?.lifetimeAccess || user?.subscriptionStatus === "active";
+  const hasAccess = activeCourseSlugs.has(course.slug);
   const isLocked = !lesson.isFree && !hasAccess;
-  const completedSlugs = user?.progress.map((p: { lessonSlug: string }) => p.lessonSlug) ?? [];
+  const completedSlugs = progress.map((p) => p.lessonSlug);
   const isCompleted = completedSlugs.includes(lesson.slug);
 
-  const modLessons = mod?.lessons ?? [];
-  const currentIdx = modLessons.findIndex((l: { slug: string }) => l.slug === lesson.slug);
+  const modLessons = mod.lessons;
+  const currentIdx = modLessons.findIndex((l) => l.slug === lesson.slug);
   const nextLesson = modLessons[currentIdx + 1] ?? null;
   const prevLesson = modLessons[currentIdx - 1] ?? null;
 
   return (
     <div className="flex h-screen bg-zinc-950">
-      <Sidebar modules={modules} completedSlugs={completedSlugs} hasAccess={hasAccess} />
+      <Sidebar
+        courseSlug={course.slug}
+        courseTitle={course.title}
+        modules={course.modules}
+        completedSlugs={completedSlugs}
+        hasAccess={hasAccess}
+      />
 
       <main className="flex flex-1 flex-col overflow-y-auto">
         {isLocked ? (
@@ -57,7 +66,7 @@ export default async function LessonPage({ params }: Props) {
               </p>
             </div>
             <Link
-              href="/#pricing"
+              href={`/courses/${course.slug}#pricing`}
               className="rounded-xl bg-blue-600 px-6 py-3 font-medium text-white hover:bg-blue-500 transition-colors"
             >
               Відкрити всі уроки
@@ -66,7 +75,7 @@ export default async function LessonPage({ params }: Props) {
         ) : (
           <div className="mx-auto w-full max-w-4xl px-8 py-10">
             <div className="mb-2 flex items-center gap-2 text-xs text-zinc-500">
-              <span>{mod?.code}</span>
+              <span>{mod.code}</span>
               <span>·</span>
               <span>{lesson.duration}</span>
             </div>
@@ -88,6 +97,7 @@ export default async function LessonPage({ params }: Props) {
 
             <div className="mt-6 flex items-center justify-between">
               <MarkCompleteButton
+                courseSlug={course.slug}
                 lessonSlug={lesson.slug}
                 userId={session.user.id}
                 isCompleted={isCompleted}
@@ -96,7 +106,7 @@ export default async function LessonPage({ params }: Props) {
               <div className="flex gap-3">
                 {prevLesson && (
                   <Link
-                    href={`/academy/${moduleId}/${prevLesson.slug}`}
+                    href={`/academy/${course.slug}/${moduleId}/${prevLesson.slug}`}
                     className="rounded-lg border border-zinc-700 px-4 py-2 text-sm text-zinc-400 hover:text-white transition-colors"
                   >
                     ← Попередній
@@ -104,7 +114,7 @@ export default async function LessonPage({ params }: Props) {
                 )}
                 {nextLesson && (hasAccess || nextLesson.isFree) && (
                   <Link
-                    href={`/academy/${moduleId}/${nextLesson.slug}`}
+                    href={`/academy/${course.slug}/${moduleId}/${nextLesson.slug}`}
                     className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-500 transition-colors"
                   >
                     Наступний →

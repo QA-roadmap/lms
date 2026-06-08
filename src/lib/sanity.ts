@@ -1,4 +1,5 @@
 import { createClient } from "next-sanity";
+import type { SanityCourse, SanityLesson, SanityModule } from "@/types/sanity";
 
 export const sanityClient = createClient({
   projectId: "vprlxx2h",
@@ -7,28 +8,56 @@ export const sanityClient = createClient({
   useCdn: true,
 });
 
-export async function getModules() {
+const MODULE_PROJECTION = `{
+  _id,
+  title,
+  code,
+  description,
+  order,
+  "lessons": lessons[]-> {
+    _id,
+    title,
+    "slug": slug.current,
+    duration,
+    isFree,
+    isCapstone,
+    videoUrl,
+    order
+  } | order(order asc)
+}`;
+
+const COURSE_PROJECTION = `{
+  _id,
+  title,
+  "slug": slug.current,
+  tagline,
+  description,
+  status,
+  priceUSD,
+  order,
+  "modules": modules[]-> ${MODULE_PROJECTION} | order(order asc)
+}`;
+
+export async function getCourses(): Promise<SanityCourse[]> {
   return sanityClient.fetch(
-    `*[_type == "module"] | order(order asc) {
-      _id,
-      title,
-      code,
-      description,
-      order,
-      "lessons": lessons[]-> {
-        _id,
-        title,
-        "slug": slug.current,
-        duration,
-        isFree,
-        videoUrl,
-        order
-      }
-    }`
+    `*[_type == "course"] | order(order asc) ${COURSE_PROJECTION}`
   );
 }
 
-export async function getLesson(slug: string) {
+export async function getCourseBySlug(slug: string): Promise<SanityCourse | null> {
+  return sanityClient.fetch(
+    `*[_type == "course" && slug.current == $slug][0] ${COURSE_PROJECTION}`,
+    { slug }
+  );
+}
+
+export async function getModules(): Promise<SanityModule[]> {
+  return sanityClient.fetch(
+    `*[_type == "module"] | order(order asc) ${MODULE_PROJECTION}`
+  );
+}
+
+export async function getLesson(slug: string): Promise<SanityLesson | null> {
   return sanityClient.fetch(
     `*[_type == "lesson" && slug.current == $slug][0] {
       _id,
@@ -36,20 +65,9 @@ export async function getLesson(slug: string) {
       "slug": slug.current,
       duration,
       isFree,
+      isCapstone,
       videoUrl,
       content,
-      order
-    }`,
-    { slug }
-  );
-}
-
-export async function getModuleByLessonSlug(slug: string) {
-  return sanityClient.fetch(
-    `*[_type == "module" && references(*[_type == "lesson" && slug.current == $slug]._id)][0] {
-      _id,
-      title,
-      code,
       order
     }`,
     { slug }

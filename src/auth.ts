@@ -30,8 +30,6 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
         const dbUser = await db.user.findUnique({ where: { email: user.email } });
         if (dbUser) {
           token.userId = dbUser.id;
-          token.lifetimeAccess = dbUser.lifetimeAccess;
-          token.subscriptionStatus = dbUser.subscriptionStatus ?? null;
         }
       }
       return token;

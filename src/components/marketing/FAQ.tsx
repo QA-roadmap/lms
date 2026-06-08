@@ -6,32 +6,32 @@ import { clsx } from "clsx";
 
 const FAQS = [
   {
-    q: "Who is this for?",
-    a: "Software engineers and ML practitioners who want to move from prototypes to production AI systems. You should be comfortable with Python and basic programming — this is not for complete beginners.",
+    q: "Кому підійдуть ці курси?",
+    a: "Тим, хто хоче увійти в IT через тестування з нуля, а також ручним тестувальникам, які хочуть прокачатись до автоматизації. Спеціальний досвід не потрібен — досить впевненого користування комп'ютером.",
   },
   {
-    q: "What's the difference between monthly and lifetime?",
-    a: "Both plans give identical access to all content. Monthly is $39/month and you can cancel anytime. Lifetime is $197 once — pay once, access everything forever including all future updates.",
+    q: "Чи отримую я довічний доступ?",
+    a: "Так — кожен курс купується один раз. Заплатив один раз — і курс назавжди твій, разом з усіма майбутніми оновленнями контенту. Жодних підписок чи повторних списань.",
   },
   {
-    q: "Is there a free trial?",
-    a: "Two lessons are completely free without sign-up: Ollama Setup and LangChain Basics. You can start learning right now to see if the teaching style works for you.",
+    q: "Чи можна спробувати безкоштовно?",
+    a: "Так — перші уроки кожного курсу відкриті без реєстрації та оплати. Можна одразу зануритись і зрозуміти, чи підходить тобі формат подачі.",
   },
   {
-    q: "What tech stack is covered?",
-    a: "Python, LangChain, LangGraph, Ollama, various vector DBs (Pinecone, Chroma, pgvector), FastAPI, Docker, and cloud deployment. We focus on the tools production teams actually use.",
+    q: "Які інструменти й теми ви розглядаєте?",
+    a: "Тест-дизайн і тест-кейси, баг-репортинг, тестування API (Postman), основи SQL і Git, а також автоматизацію на Selenium і Playwright. Фокус на тому, чим реально користуються QA-команди в продуктах.",
   },
   {
-    q: "How is this different from YouTube tutorials?",
-    a: "Every concept is tied to a real project you deploy. We cover the hard parts: evaluation, monitoring, error handling, cost optimization — things YouTube skips. Plus you get a verifiable certificate and community access.",
+    q: "Чим це відрізняється від безкоштовних відео на YouTube?",
+    a: "Кожна тема прив'язана до реального проєкту, який ти доводиш до кінця. Ми розбираємо складні речі — пріоритизацію тестування, роботу з вимогами, регресію, комунікацію з розробниками — те, що відео на YouTube зазвичай оминають. Плюс — сертифікат і доступ до спільноти.",
   },
   {
-    q: "Do I get a certificate?",
-    a: "Yes. After completing all modules you receive a certificate with a unique public URL that you can share on LinkedIn or your resume.",
+    q: "Чи видаєте ви сертифікат?",
+    a: "Так. Після завершення всіх модулів курсу ти отримуєш сертифікат з унікальним публічним посиланням, яким можна поділитись у LinkedIn чи резюме.",
   },
   {
-    q: "Is there a money-back guarantee?",
-    a: "Yes — 30 days, no questions asked. If you're not satisfied for any reason, email us and you'll get a full refund.",
+    q: "Чи є гарантія повернення коштів?",
+    a: "Так — 30 днів без зайвих питань. Якщо курс із якоїсь причини не підійшов, напиши нам і отримаєш повне повернення коштів.",
   },
 ];
 
@@ -43,7 +43,7 @@ export function FAQ() {
       <div className="mx-auto max-w-3xl">
         <div className="mb-12 text-center">
           <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
-            Frequently Asked Questions
+            Поширені запитання
           </h2>
         </div>
 

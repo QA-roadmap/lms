@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/auth";
 import { createCheckout } from "@/lib/hutko";
+import { getCourseBySlug } from "@/lib/sanity";
 
 function nanoid() {
   return Math.random().toString(36).slice(2, 10);
@@ -12,26 +13,25 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
   }
 
-  const { plan } = (await req.json()) as { plan: "lifetime" | "monthly" };
+  const { courseSlug } = (await req.json()) as { courseSlug: string };
+
+  const course = await getCourseBySlug(courseSlug);
+  const usdPrice = course?.priceUSD;
+  if (!course || course.status !== "available" || usdPrice === undefined) {
+    return NextResponse.json({ error: "Course not purchasable" }, { status: 400 });
+  }
+
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL!;
-  const isLifetime = plan === "lifetime";
   const orderId = `${session.user.id}_${nanoid()}`;
+  const rate = Number(process.env.USD_TO_UAH_RATE!);
 
   const checkout = await createCheckout({
     order_id: orderId,
-    order_desc: isLifetime ? "Lifetime Access" : "Monthly Subscription",
-    amount: isLifetime
-      ? Number(process.env.HUTKO_LIFETIME_AMOUNT!)
-      : Number(process.env.HUTKO_MONTHLY_AMOUNT!),
+    order_desc: `${course.title} — Course Access`,
+    amount: Math.round(usdPrice * rate * 100),
     server_callback_url: `${baseUrl}/api/hutko/callback`,
-    response_url: `${baseUrl}/academy?payment=success`,
-    merchant_data: JSON.stringify({ userId: session.user.id, plan }),
-    ...(plan === "monthly"
-      ? {
-          subscription: "Y",
-          subscription_callback_url: `${baseUrl}/api/hutko/callback`,
-        }
-      : {}),
+    response_url: `${baseUrl}/academy/${courseSlug}?payment=success`,
+    merchant_data: JSON.stringify({ userId: session.user.id, courseSlug }),
   });
 
   return NextResponse.json({ checkoutUrl: checkout.checkout_url });
