@@ -11,11 +11,12 @@ catalog and lesson content.
   to a custom path: `src/generated/prisma` (not the default `node_modules/.prisma`).
 - **Auth**: NextAuth v5 beta, **JWT strategy with manual DB upsert** — `PrismaAdapter` is
   incompatible with Prisma 7, do not reintroduce it. See `src/auth.ts` / `src/auth.config.ts`.
-- **Payments**: Hutko (ПУМБ) — Ukrainian payment gateway, not Stripe (Stripe deps exist but are
-  unused legacy). Each course has a single one-time `priceUSD` in Sanity (no monthly/lifetime
-  split — buy once, own the course forever). Checkout at `/api/checkout` converts USD → UAH via
-  `USD_TO_UAH_RATE`; webhook at `/api/hutko/callback` upserts a per-course `Purchase` row; logic
-  in `src/lib/hutko.ts`.
+- **Payments**: Monobank merchant API — Ukrainian payment gateway, not Stripe (Stripe deps exist
+  but are unused legacy). Each course has a single one-time `priceUSD` in Sanity (buy once, own
+  the course forever). Checkout at `/api/checkout` converts USD → UAH via `USD_TO_UAH_RATE`,
+  creates a Monobank invoice, and upserts a `pending` `Purchase` row with `invoiceId`. Webhook
+  at `/api/monobank/webhook` verifies ECDSA signature and flips `status` to `active` on success;
+  logic in `src/lib/monobank.ts`.
 - **Blog**: MDX files in `content/blog/` rendered via `next-mdx-remote`/`gray-matter`, plus a
   Hashnode API mirror (`src/lib/hashnode.ts`, `src/lib/blog.ts`).
 - **Styling**: Tailwind v4.
@@ -33,7 +34,7 @@ catalog was migrated into Sanity (see Studio schema in the sibling `studio-qa/` 
 
 ## Per-course access model
 Access is purchase-based and scoped per course, not global:
-- `Purchase` (`userId + courseSlug`, unique) tracks `status: "active" | "canceled"`. A user has
+- `Purchase` (`userId + courseSlug`, unique) tracks `status: "pending" | "active" | "canceled"` and `invoiceId` (Monobank invoice). A user has
   access to a course iff an active `Purchase` row exists for that pair — see `src/lib/access.ts`
   (`getActiveCourseSlugs`).
 - `UserProgress` is keyed by `userId + courseSlug + lessonSlug`.

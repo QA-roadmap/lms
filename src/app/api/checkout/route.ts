@@ -1,7 +1,8 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/auth";
-import { createCheckout } from "@/lib/hutko";
+import { createInvoice } from "@/lib/monobank";
 import { getCourseBySlug } from "@/lib/sanity";
+import { db } from "@/lib/db";
 
 function nanoid() {
   return Math.random().toString(36).slice(2, 10);
@@ -22,17 +23,32 @@ export async function POST(req: NextRequest) {
   }
 
   const baseUrl = process.env.NEXT_PUBLIC_APP_URL!;
-  const orderId = `${session.user.id}_${nanoid()}`;
   const rate = Number(process.env.USD_TO_UAH_RATE!);
+  const amountKopecks = Math.round(usdPrice * rate * 100);
+  const reference = `${session.user.id}_${nanoid()}`;
 
-  const checkout = await createCheckout({
-    order_id: orderId,
-    order_desc: `${course.title} — Course Access`,
-    amount: Math.round(usdPrice * rate * 100),
-    server_callback_url: `${baseUrl}/api/hutko/callback`,
-    response_url: `${baseUrl}/academy/${courseSlug}?payment=success`,
-    merchant_data: JSON.stringify({ userId: session.user.id, courseSlug }),
+  const invoice = await createInvoice({
+    amount: amountKopecks,
+    reference,
+    destination: `${course.title} — доступ до курсу`,
+    redirectUrl: `${baseUrl}/academy/${courseSlug}?payment=success`,
+    webHookUrl: `${baseUrl}/api/monobank/webhook`,
   });
 
-  return NextResponse.json({ checkoutUrl: checkout.checkout_url });
+  // Upsert a pending Purchase so the webhook can resolve userId + courseSlug from invoiceId
+  await db.purchase.upsert({
+    where: { userId_courseSlug: { userId: session.user.id, courseSlug } },
+    create: {
+      userId: session.user.id,
+      courseSlug,
+      status: "pending",
+      invoiceId: invoice.invoiceId,
+    },
+    update: {
+      status: "pending",
+      invoiceId: invoice.invoiceId,
+    },
+  });
+
+  return NextResponse.json({ checkoutUrl: invoice.pageUrl });
 }
