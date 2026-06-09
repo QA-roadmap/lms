@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import Link from "next/link";
 import { Navbar } from "@/components/marketing/Navbar";
 import { Footer } from "@/components/marketing/Footer";
 import { CourseHero } from "@/components/marketing/CourseHero";
@@ -9,6 +10,8 @@ import { CourseTestimonials } from "@/components/marketing/CourseTestimonials";
 import { CourseFAQ } from "@/components/marketing/CourseFAQ";
 import { Pricing } from "@/components/marketing/Pricing";
 import { getCourses, getCourseBySlug } from "@/lib/sanity";
+import { auth } from "@/auth";
+import { getActiveCourseSlugs } from "@/lib/access";
 
 type Props = {
   params: Promise<{ slug: string }>;
@@ -21,10 +24,16 @@ export async function generateStaticParams() {
 
 export default async function CourseDetailPage({ params }: Props) {
   const { slug } = await params;
-  const course = await getCourseBySlug(slug);
+  const [course, session] = await Promise.all([getCourseBySlug(slug), auth()]);
   if (!course) notFound();
 
   const isAvailable = course.status === "available";
+
+  let hasPurchased = false;
+  if (session?.user?.id) {
+    const activeSlugs = await getActiveCourseSlugs(session.user.id);
+    hasPurchased = activeSlugs.has(slug);
+  }
 
   return (
     <div className="min-h-screen bg-zinc-950">
@@ -63,8 +72,30 @@ export default async function CourseDetailPage({ params }: Props) {
       {/* Testimonials */}
       <CourseTestimonials />
 
-      {/* Pricing CTA */}
-      {isAvailable && course.priceUSD !== undefined && <Pricing course={course} />}
+      {/* Pricing CTA or purchased banner */}
+      {isAvailable && (
+        hasPurchased ? (
+          <section id="pricing" className="bg-zinc-950 px-4 py-24">
+            <div className="mx-auto max-w-xl rounded-2xl border border-emerald-500/30 bg-emerald-500/5 p-10 text-center">
+              <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-emerald-500/15">
+                <svg className="h-7 w-7 text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+                  <path strokeLinecap="round" strokeLinejoin="round" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                </svg>
+              </div>
+              <h2 className="text-2xl font-bold text-white">Ти вже маєш доступ</h2>
+              <p className="mt-2 text-zinc-400">Цей курс доступний у твоєму кабінеті</p>
+              <Link
+                href={`/academy/${slug}`}
+                className="mt-6 inline-flex items-center gap-2 rounded-xl bg-emerald-600 px-8 py-3 text-sm font-semibold text-white shadow-lg shadow-emerald-600/25 transition-colors hover:bg-emerald-500"
+              >
+                Продовжити навчання →
+              </Link>
+            </div>
+          </section>
+        ) : (
+          course.priceUSD !== undefined && <Pricing course={course} />
+        )
+      )}
 
       {/* FAQ */}
       <CourseFAQ />
