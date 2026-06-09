@@ -8,6 +8,8 @@ import type { Metadata } from "next";
 import { Navbar } from "@/components/marketing/Navbar";
 import { Footer } from "@/components/marketing/Footer";
 import { BADGES, getAllSkillSlugs, getSkillCardBySlug, getSkillGuide } from "@/lib/skills";
+import { extractToc } from "@/lib/toc";
+import { TableOfContents } from "@/components/skills/TableOfContents";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -32,12 +34,13 @@ export default async function SkillGuidePage({ params }: Props) {
   if (!card || !guide) notFound();
 
   const badge = BADGES[card.badge];
+  const toc = extractToc(guide);
 
   return (
     <div className="min-h-screen bg-zinc-950">
       <Navbar />
 
-      <main className="mx-auto max-w-3xl px-4 py-12">
+      <main className="mx-auto max-w-7xl px-4 py-12">
         <Link
           href="/skills"
           className="mb-8 flex items-center gap-2 text-sm text-zinc-500 transition-colors hover:text-zinc-300"
@@ -46,14 +49,28 @@ export default async function SkillGuidePage({ params }: Props) {
           Усі скіли
         </Link>
 
-        <span
-          className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${badge.className}`}
-        >
-          {badge.label}
-        </span>
+        <div className="flex gap-12">
+          {/* Main content */}
+          <div className="min-w-0 flex-1">
+            <span
+              className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium ${badge.className}`}
+            >
+              {badge.label}
+            </span>
 
-        <div className="article-body guide-body mt-8">
-          <MDXRemote source={guide} options={mdxOptions} />
+            <div className="article-body guide-body mt-8">
+              <MDXRemote source={guide} options={mdxOptions} />
+            </div>
+          </div>
+
+          {/* TOC sidebar */}
+          {toc.length > 0 && (
+            <aside className="hidden xl:block w-56 shrink-0">
+              <div className="sticky top-8">
+                <TableOfContents entries={toc} />
+              </div>
+            </aside>
+          )}
         </div>
       </main>
 
