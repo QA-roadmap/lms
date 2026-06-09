@@ -16,7 +16,10 @@ catalog and lesson content.
   the course forever). Checkout at `/api/checkout` converts USD → UAH via `USD_TO_UAH_RATE`,
   creates a Monobank invoice, and upserts a `pending` `Purchase` row with `invoiceId`. Webhook
   at `/api/monobank/webhook` verifies ECDSA signature and flips `status` to `active` on success;
-  logic in `src/lib/monobank.ts`.
+  logic in `src/lib/monobank.ts`. The checkout route validates env vars explicitly and wraps
+  everything in try/catch — errors surface as `{ error: string }` JSON (not silent 500s).
+  **Token**: must be a merchant/acquiring token from `web.monobank.ua` → Еквайринг section.
+  Personal tokens from `api.monobank.ua` return FORBIDDEN on all merchant endpoints.
 - **Blog**: MDX files in `content/blog/` rendered via `next-mdx-remote`/`gray-matter`, plus a
   Hashnode API mirror (`src/lib/hashnode.ts`, `src/lib/blog.ts`).
 - **Styling**: Tailwind v4.
@@ -40,6 +43,9 @@ Access is purchase-based and scoped per course, not global:
 - `UserProgress` is keyed by `userId + courseSlug + lessonSlug`.
 - There are no global `User.lifetimeAccess` / `subscriptionStatus` flags anymore — access is
   always resolved per course via `Purchase`.
+- `courses/[slug]/page.tsx` checks purchase status server-side: if the user already owns the
+  course, the `<Pricing>` block is replaced with a "Ти вже маєш доступ" banner linking to
+  `/academy/[slug]`. Auth + purchase check run in parallel via `Promise.all`.
 
 ## Layout quirks
 - `src/app/(academy)/academy` and `src/app/(auth)/sign-in` are empty leftover route-group
