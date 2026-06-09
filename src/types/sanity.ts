@@ -21,6 +21,8 @@ export type SanityModule = {
 
 export type SanityCourseStatus = "available" | "coming-soon";
 
+export type SanityCourseType = "flagship" | "mini";
+
 export type SanityCourse = {
   _id: string;
   title: string;
@@ -28,6 +30,7 @@ export type SanityCourse = {
   tagline?: string;
   description?: string;
   status: SanityCourseStatus;
+  courseType?: SanityCourseType;
   priceUSD?: number;
   order?: number;
   modules: SanityModule[];

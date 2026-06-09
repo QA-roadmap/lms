@@ -33,6 +33,7 @@ const COURSE_PROJECTION = `{
   tagline,
   description,
   status,
+  courseType,
   priceUSD,
   order,
   "modules": modules[]-> ${MODULE_PROJECTION} | order(order asc)
