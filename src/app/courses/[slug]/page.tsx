@@ -1,12 +1,14 @@
-import Link from "next/link";
 import { notFound } from "next/navigation";
 import { Navbar } from "@/components/marketing/Navbar";
 import { Footer } from "@/components/marketing/Footer";
+import { CourseHero } from "@/components/marketing/CourseHero";
+import { CourseForWhom } from "@/components/marketing/CourseForWhom";
+import { CourseSkillsSection } from "@/components/marketing/CourseSkillsSection";
 import { ModuleAccordion } from "@/components/marketing/ModuleAccordion";
+import { CourseTestimonials } from "@/components/marketing/CourseTestimonials";
+import { CourseFAQ } from "@/components/marketing/CourseFAQ";
 import { Pricing } from "@/components/marketing/Pricing";
-import { Badge } from "@/components/ui/Badge";
 import { getCourses, getCourseBySlug } from "@/lib/sanity";
-import { courseLessonCount } from "@/lib/courses";
 
 type Props = {
   params: Promise<{ slug: string }>;
@@ -23,59 +25,60 @@ export default async function CourseDetailPage({ params }: Props) {
   if (!course) notFound();
 
   const isAvailable = course.status === "available";
-  const lessonCount = courseLessonCount(course);
 
   return (
     <div className="min-h-screen bg-zinc-950">
       <Navbar />
 
-      <main className="mx-auto max-w-4xl px-4 py-16">
-        <Link
-          href="/courses"
-          className="text-sm text-zinc-500 hover:text-white transition-colors"
-        >
-          ← Усі курси
-        </Link>
+      {/* Hero */}
+      <CourseHero course={course} />
 
-        <div className="mt-6 mb-12">
-          <div className="flex flex-wrap items-center gap-3">
-            <h1 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
-              {course.title}
-            </h1>
-            {isAvailable ? (
-              <Badge variant="free">Доступний</Badge>
-            ) : (
-              <Badge variant="default">Скоро</Badge>
-            )}
-          </div>
-          <p className="mt-3 text-lg text-zinc-400">{course.tagline}</p>
-          <p className="mt-4 max-w-2xl text-zinc-500">{course.description}</p>
-          <p className="mt-4 text-sm text-zinc-600">
-            {course.modules.length} модулів · {lessonCount} уроків
-          </p>
+      {/* For whom */}
+      <CourseForWhom />
 
-          <div className="mt-8">
-            {isAvailable ? (
-              course.priceUSD !== undefined ? (
-                <a
-                  href="#pricing"
-                  className="inline-flex rounded-xl bg-blue-600 px-6 py-3 text-sm font-semibold text-white shadow-md shadow-blue-600/30 hover:bg-blue-500 transition-colors"
-                >
-                  Отримати доступ · ${course.priceUSD}
-                </a>
-              ) : null
-            ) : (
-              <span className="inline-flex cursor-not-allowed rounded-xl border border-zinc-800 px-6 py-3 text-sm font-semibold text-zinc-600">
-                Скоро з’явиться
-              </span>
-            )}
+      {/* Skills covered */}
+      <CourseSkillsSection courseSlug={slug} />
+
+      {/* Curriculum */}
+      <section id="curriculum" className="bg-zinc-950 px-4 py-20">
+        <div className="mx-auto max-w-4xl">
+          <div className="mb-10 text-center">
+            <p className="mb-3 text-sm font-semibold uppercase tracking-widest text-blue-500">
+              Програма
+            </p>
+            <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
+              Що всередині курсу
+            </h2>
+            <p className="mx-auto mt-4 max-w-xl text-zinc-400">
+              {course.modules.length} модулів, кожен з практичними завданнями та фінальним проєктом
+            </p>
           </div>
+          <ModuleAccordion
+            modules={course.modules}
+            defaultOpenId={course.modules[0]?._id ?? null}
+          />
         </div>
+      </section>
 
-        <ModuleAccordion modules={course.modules} defaultOpenId={course.modules[0]?._id ?? null} />
-      </main>
+      {/* Testimonials */}
+      <CourseTestimonials />
 
+      {/* Pricing CTA */}
       {isAvailable && course.priceUSD !== undefined && <Pricing course={course} />}
+
+      {/* FAQ */}
+      <CourseFAQ />
+
+      {/* Final bottom CTA for coming soon */}
+      {!isAvailable && (
+        <section className="bg-zinc-950 px-4 py-20 text-center">
+          <p className="text-sm font-semibold uppercase tracking-widest text-zinc-600">Незабаром</p>
+          <h2 className="mt-3 text-2xl font-bold text-white">Курс ще готується</h2>
+          <p className="mx-auto mt-3 max-w-sm text-zinc-500">
+            Залиш email і ми повідомимо, коли відкриється доступ
+          </p>
+        </section>
+      )}
 
       <Footer />
     </div>

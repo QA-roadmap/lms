@@ -1,5 +1,7 @@
 @import "tailwindcss";
 
+@custom-variant light (&:where(.light, .light *));
+
 @theme inline {
   --font-sans: var(--font-geist-sans);
   --font-mono: var(--font-geist-mono);
@@ -8,6 +10,42 @@
 * {
   box-sizing: border-box;
 }
+
+/* ─── Light theme overrides ──────────────────────────────────────────── */
+
+/* Base */
+html.light body { background-color: #fff; color: #18181b; }
+
+/* Backgrounds */
+html.light .bg-zinc-950     { background-color: #fff; }
+html.light .bg-zinc-950\/80 { background-color: rgb(255 255 255 / 0.8); }
+html.light .bg-zinc-900     { background-color: #f4f4f5; }
+html.light .bg-zinc-900\/50 { background-color: rgb(244 244 245 / 0.5); }
+html.light .bg-zinc-800     { background-color: #e4e4e7; }
+html.light .bg-zinc-800\/50 { background-color: rgb(228 228 231 / 0.5); }
+html.light .bg-zinc-700     { background-color: #d4d4d8; }
+
+/* Hover backgrounds */
+html.light .hover\:bg-zinc-800:hover { background-color: #e4e4e7; }
+html.light .hover\:bg-zinc-900:hover { background-color: #f4f4f5; }
+
+/* Text */
+html.light .text-white    { color: #18181b; }
+html.light .text-zinc-100 { color: #27272a; }
+html.light .text-zinc-300 { color: #3f3f46; }
+html.light .text-zinc-400 { color: #52525b; }
+html.light .text-blue-400 { color: #2563eb; }
+
+/* Hover text */
+html.light .hover\:text-white:hover { color: #18181b; }
+
+/* Borders */
+html.light .border-zinc-800 { border-color: #e4e4e7; }
+html.light .border-zinc-700 { border-color: #d4d4d8; }
+
+/* Exception: white text on explicitly blue/colored buttons stays white */
+html.light .bg-blue-600.text-white,
+html.light .bg-blue-500.text-white { color: #fff; }
 
 body {
   font-family: var(--font-geist-sans), system-ui, sans-serif;
@@ -160,6 +198,54 @@ body {
   max-width: 100%;
 }
 
+/* ─── Light theme: article-body ────────────────────────────────────────── */
+
+html.light .article-body,
+html.light .article-body p,
+html.light .article-body ul,
+html.light .article-body ol,
+html.light .article-body li  { color: #3f3f46; }
+
+html.light .article-body h1,
+html.light .article-body h2,
+html.light .article-body h3,
+html.light .article-body h4  { color: #18181b; }
+
+html.light .article-body strong { color: #18181b; }
+html.light .article-body em     { color: #52525b; }
+html.light .article-body li::marker { color: #71717a; }
+
+html.light .article-body a { color: #2563eb; }
+
+html.light .article-body blockquote { color: #52525b; }
+
+html.light .article-body code {
+  background: #f4f4f5;
+  color: #1d4ed8;
+}
+
+html.light .article-body pre {
+  background: #f8f8f8;
+  border-color: #e4e4e7;
+}
+html.light .article-body pre code {
+  background: transparent;
+  color: #18181b;
+}
+
+html.light .article-body hr    { border-color: #e4e4e7; }
+html.light .article-body img   { border-color: #e4e4e7; }
+
+html.light .article-body th {
+  color: #18181b;
+  background: #e4e4e7;
+  border-bottom-color: #d4d4d8;
+}
+html.light .article-body td {
+  color: #52525b;
+  border-bottom-color: #e4e4e7;
+}
+
 /* ─── Skill guide — richer technical-doc prose (layers on .article-body) ─ */
 
 .guide-body h2 {
@@ -213,5 +299,87 @@ body {
 }
 .guide-body pre:not([data-language]) code {
   color: #a1a1aa;
+}
+
+/* ─── Light theme: guide-body ───────────────────────────────────────────── */
+
+html.light .guide-body h2 { border-bottom-color: #e4e4e7; }
+html.light .guide-body h3 { color: #0284c7; /* sky-600 */ }
+
+html.light .guide-body hr {
+  background: linear-gradient(to right, transparent, #d4d4d8 15%, #d4d4d8 85%, transparent);
+}
+
+html.light .guide-body table  { border-color: #e4e4e7; }
+html.light .guide-body tbody tr:hover td { background: rgba(0, 0, 0, 0.03); }
+
+html.light .guide-body pre:not([data-language]) {
+  background: #f8f8f8;
+}
+html.light .guide-body pre:not([data-language]) code { color: #52525b; }
+
+/* ─── Course page animations ─────────────────────────────────────────────── */
+
+@keyframes glow-pulse {
+  0%, 100% { opacity: 0.4; transform: scale(1); }
+  50%       { opacity: 0.7; transform: scale(1.05); }
+}
+
+@keyframes fade-up {
+  from { opacity: 0; transform: translateY(20px); }
+  to   { opacity: 1; transform: translateY(0); }
+}
+
+@keyframes shimmer {
+  0%   { background-position: -200% center; }
+  100% { background-position:  200% center; }
+}
+
+@keyframes border-glow {
+  0%, 100% { box-shadow: 0 0 0 0 rgba(59,130,246,0); }
+  50%       { box-shadow: 0 0 24px 2px rgba(59,130,246,0.18); }
+}
+
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50%       { transform: translateY(-6px); }
+}
+
+.animate-glow-pulse  { animation: glow-pulse 4s ease-in-out infinite; }
+.animate-fade-up     { animation: fade-up 0.6s ease both; }
+.animate-float       { animation: float 4s ease-in-out infinite; }
+.animate-border-glow { animation: border-glow 3s ease-in-out infinite; }
+
+.shimmer-text {
+  background: linear-gradient(
+    90deg,
+    #93c5fd 0%,
+    #ffffff 40%,
+    #93c5fd 60%,
+    #3b82f6 100%
+  );
+  background-size: 200% auto;
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  animation: shimmer 4s linear infinite;
+}
+
+/* Staggered fade-up for children */
+.stagger-children > *:nth-child(1) { animation-delay: 0.05s; }
+.stagger-children > *:nth-child(2) { animation-delay: 0.12s; }
+.stagger-children > *:nth-child(3) { animation-delay: 0.19s; }
+.stagger-children > *:nth-child(4) { animation-delay: 0.26s; }
+.stagger-children > *:nth-child(5) { animation-delay: 0.33s; }
+.stagger-children > *:nth-child(6) { animation-delay: 0.40s; }
+
+/* Card hover glow */
+.card-hover-glow {
+  transition: box-shadow 0.3s ease, border-color 0.3s ease, transform 0.3s ease;
+}
+.card-hover-glow:hover {
+  box-shadow: 0 0 32px rgba(59,130,246,0.12), 0 8px 32px rgba(0,0,0,0.3);
+  border-color: rgba(59,130,246,0.4) !important;
+  transform: translateY(-2px);
 }
 
