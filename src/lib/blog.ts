@@ -2,22 +2,12 @@ import fs from "fs";
 import path from "path";
 import matter from "gray-matter";
 import readingTime from "reading-time";
+import type { PostMeta, Post } from "./blog-meta";
+
+export type { PostMeta, Post } from "./blog-meta";
+export { formatDate } from "./blog-meta";
 
 const BLOG_DIR = path.join(process.cwd(), "content/blog");
-
-export type PostMeta = {
-  slug: string;
-  title: string;
-  excerpt: string;
-  date: string;
-  tags: string[];
-  coverImage?: string;
-  readingTime: string;
-};
-
-export type Post = PostMeta & {
-  content: string;
-};
 
 function slugFromFile(filename: string) {
   return filename.replace(/\.mdx?$/, "");
@@ -35,9 +25,10 @@ export function getAllPosts(): PostMeta[] {
       return {
         slug: slugFromFile(filename),
         title: data.title as string,
-        excerpt: data.excerpt as string,
+        excerpt: (data.excerpt as string) ?? (data.description as string) ?? "",
         date: data.date as string,
         tags: (data.tags as string[]) ?? [],
+        category: (data.category as string) ?? "Інше",
         coverImage: data.coverImage as string | undefined,
         readingTime: readingTime(content).text,
       };
@@ -62,19 +53,12 @@ export function getPost(slug: string): Post | null {
   return {
     slug,
     title: data.title as string,
-    excerpt: data.excerpt as string,
+    excerpt: (data.excerpt as string) ?? (data.description as string) ?? "",
     date: data.date as string,
     tags: (data.tags as string[]) ?? [],
+    category: (data.category as string) ?? "Інше",
     coverImage: data.coverImage as string | undefined,
     readingTime: readingTime(content).text,
     content,
   };
-}
-
-export function formatDate(dateStr: string) {
-  return new Date(dateStr).toLocaleDateString("en-US", {
-    year: "numeric",
-    month: "long",
-    day: "numeric",
-  });
 }

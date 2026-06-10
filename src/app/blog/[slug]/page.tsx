@@ -41,21 +41,25 @@ export default async function BlogPostPage({ params }: Props) {
           className="mb-8 flex items-center gap-2 text-sm text-zinc-500 hover:text-zinc-300 transition-colors"
         >
           <ArrowLeft className="h-4 w-4" />
-          Back to Blog
+          Назад до QA Journal
         </Link>
 
-        {post.tags.length > 0 && (
-          <div className="mb-4 flex flex-wrap gap-2">
-            {post.tags.map((tag) => (
-              <span
-                key={tag}
-                className="rounded-full bg-blue-500/10 px-3 py-1 text-xs font-medium text-blue-400"
-              >
-                {tag}
-              </span>
-            ))}
-          </div>
-        )}
+        <div className="mb-4 flex flex-wrap gap-2">
+          <Link
+            href={`/blog?category=${encodeURIComponent(post.category)}`}
+            className="rounded-full bg-zinc-800 px-3 py-1 text-xs font-medium text-zinc-300 transition-colors hover:bg-zinc-700"
+          >
+            {post.category}
+          </Link>
+          {post.tags.map((tag) => (
+            <span
+              key={tag}
+              className="rounded-full bg-blue-500/10 px-3 py-1 text-xs font-medium text-blue-400"
+            >
+              {tag}
+            </span>
+          ))}
+        </div>
 
         <h1 className="text-3xl font-bold leading-tight tracking-tight text-white sm:text-4xl">
           {post.title}
