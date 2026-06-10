@@ -45,7 +45,7 @@ export function TableOfContents({ entries }: Props) {
         {entries.map((entry) => {
           const isActive = activeSlug === entry.slug;
           return (
-            <li key={entry.slug} className={entry.depth === 3 ? "pl-3" : ""}>
+            <li key={entry.slug}>
               <a
                 href={`#${entry.slug}`}
                 onClick={(e) => {
@@ -54,7 +54,6 @@ export function TableOfContents({ entries }: Props) {
                 }}
                 className={[
                   "block py-0.5 text-sm leading-snug transition-colors duration-150",
-                  entry.depth === 3 ? "text-xs" : "",
                   isActive
                     ? "font-medium text-blue-400"
                     : "text-zinc-500 hover:text-zinc-300",

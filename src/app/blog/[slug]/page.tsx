@@ -1,12 +1,15 @@
 import { getPost, getAllPosts, formatDate } from "@/lib/blog";
 import { Navbar } from "@/components/marketing/Navbar";
 import { Footer } from "@/components/marketing/Footer";
+import { GoogleSignInButton } from "@/components/auth/GoogleSignInButton";
 import { MDXRemote } from "next-mdx-remote/rsc";
 import { mdxOptions } from "@/lib/mdx";
+import { auth } from "@/auth";
+import { clsx } from "clsx";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ArrowLeft, Clock } from "lucide-react";
+import { ArrowLeft, Clock, Lock } from "lucide-react";
 import type { Metadata } from "next";
 import { SITE_NAME, articleSchema } from "@/lib/seo";
 
@@ -49,6 +52,9 @@ export default async function BlogPostPage({ params }: Props) {
   const { slug } = await params;
   const post = getPost(slug);
   if (!post) notFound();
+
+  const session = await auth();
+  const hasAccess = !!session?.user;
 
   return (
     <div className="min-h-screen bg-zinc-950">
@@ -122,8 +128,32 @@ export default async function BlogPostPage({ params }: Props) {
           </div>
         )}
 
-        <div className="article-body mt-10">
-          <MDXRemote source={post.content} options={mdxOptions} />
+        <div className="relative">
+          <div
+            className={clsx(
+              "article-body mt-10",
+              !hasAccess && "article-fade max-h-[520px] overflow-hidden"
+            )}
+          >
+            <MDXRemote source={post.content} options={mdxOptions} />
+          </div>
+
+          {!hasAccess && (
+            <div className="relative z-10 -mt-24 mx-auto flex max-w-lg flex-col items-center gap-4 rounded-2xl border border-zinc-800 bg-zinc-900 p-8 text-center shadow-xl shadow-black/30">
+              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-blue-500/10">
+                <Lock className="h-6 w-6 text-blue-400" />
+              </div>
+              <div>
+                <h2 className="text-xl font-semibold text-white">
+                  Продовжити читання
+                </h2>
+                <p className="mt-2 text-sm text-zinc-400">
+                  Увійдіть, щоб відкрити статтю повністю — безкоштовно і без реклами
+                </p>
+              </div>
+              <GoogleSignInButton redirectTo={`/blog/${slug}`} />
+            </div>
+          )}
         </div>
       </main>
 

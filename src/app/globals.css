@@ -167,9 +167,13 @@ body {
   margin: 2em 0;
 }
 
-/* Table */
+/* Table — wide tables scroll horizontally within their own box instead of
+   blowing out the page width on narrow screens */
 .article-body table {
+  display: block;
   width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
   border-collapse: collapse;
   font-size: 0.875rem;
   margin: 1.5em 0;
@@ -196,6 +200,12 @@ body {
   border-radius: 0.75rem;
   border: 1px solid #3f3f46;
   max-width: 100%;
+}
+
+/* Gated article preview — fades the body into the sign-in prompt below it */
+.article-fade {
+  -webkit-mask-image: linear-gradient(to bottom, #000 40%, transparent 100%);
+  mask-image: linear-gradient(to bottom, #000 40%, transparent 100%);
 }
 
 /* ─── Light theme: article-body ────────────────────────────────────────── */
@@ -272,13 +282,15 @@ html.light .article-body td {
   margin: 0;
 }
 
-/* Tables: rounded bordered container, calmer header, subtle row hover */
+/* Tables: rounded bordered container, calmer header, subtle row hover.
+   overflow-y only — overflow-x stays auto (set on .article-body table) so wide
+   tables can still scroll horizontally on narrow screens. */
 .guide-body table {
   border: 1px solid #3f3f46;
   border-radius: 0.75rem;
   border-collapse: separate;
   border-spacing: 0;
-  overflow: hidden;
+  overflow-y: hidden;
 }
 .guide-body th:empty {
   background: transparent;
