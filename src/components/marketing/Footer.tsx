@@ -16,13 +16,13 @@ export function Footer() {
 
           <nav className="flex flex-wrap gap-6 text-sm text-zinc-500">
             <Link href="/courses" className="hover:text-white transition-colors">
-              Курси
+              Програми
             </Link>
             <Link href="/skills" className="hover:text-white transition-colors">
-              Скіли
+              Кар&apos;єрний шлях
             </Link>
             <Link href="/#faq" className="hover:text-white transition-colors">
-              FAQ
+              Питання та відповіді
             </Link>
             <Link href="/academy" className="hover:text-white transition-colors">
               Кабінет

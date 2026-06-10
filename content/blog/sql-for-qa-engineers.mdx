@@ -1,0 +1,353 @@
+---
+title: "SQL для QA інженера: що реально потрібно знати з прикладами"
+description: "SQL-скілли підвищують цінність QA інженера. Але не потрібно знати все — ось мінімальний практичний набір запитів для перевірки даних після тестування."
+date: "2026-06-10"
+category: "Основи"
+tags: ["SQL", "Database", "Початківці", "Практика", "Тестування даних"]
+level: "Початківці"
+readTime: "13 хв"
+slug: "sql-for-qa-engineers"
+---
+
+# SQL для QA інженера: що реально потрібно знати
+
+SQL — один з найбільш недооцінених скілів для QA початківців. Але коли ви вперше зможете самостійно перевірити що дані правильно збереглись в БД після тесту — це змінить підхід до тестування.
+
+Ця стаття — практичний мінімум. Без академічних визначень, з реальними прикладами з QA роботи.
+
+---
+
+## Навіщо QA знати SQL
+
+**Верифікація даних.** UI показує "замовлення збережено" — але чи правильні дані в базі? Тільки SQL-запит дасть точну відповідь.
+
+**Підготовка тест-даних.** Потрібно протестити обробку замовлень "старших 30 днів" — простіше вставити тестові дані через SQL ніж створювати їх через UI.
+
+**Дебаг багів.** "Баг не репродукується" — перевіряємо стан даних в БД і знаходимо причину.
+
+**Тестування без UI.** Перевірити що бекграунд-процес правильно обробив записи — тільки через БД.
+
+---
+
+## Основи SELECT
+
+```sql
+-- Отримати всі записи з таблиці
+SELECT * FROM users;
+
+-- Отримати конкретні поля
+SELECT id, name, email FROM users;
+
+-- З умовою
+SELECT * FROM users WHERE email = 'test@example.com';
+
+-- Кілька умов
+SELECT * FROM users WHERE role = 'admin' AND is_active = true;
+SELECT * FROM orders WHERE status = 'pending' OR status = 'processing';
+```
+
+---
+
+## WHERE: умови відбору
+
+```sql
+-- Рівність і нерівність
+WHERE age = 25
+WHERE age != 25  -- або <> 25
+WHERE age > 18
+WHERE age >= 18
+WHERE age BETWEEN 18 AND 65
+
+-- Рядки
+WHERE name = 'Іван'
+WHERE email LIKE '%@gmail.com'    -- закінчується на @gmail.com
+WHERE name LIKE 'Ів%'             -- починається з "Ів"
+WHERE name ILIKE '%іван%'         -- case-insensitive пошук (PostgreSQL)
+
+-- NULL перевірка
+WHERE deleted_at IS NULL          -- активні записи
+WHERE deleted_at IS NOT NULL      -- видалені записи
+
+-- Список значень
+WHERE status IN ('pending', 'processing', 'shipped')
+WHERE id NOT IN (1, 2, 3)
+
+-- Дати
+WHERE created_at >= '2026-01-01'
+WHERE created_at BETWEEN '2026-01-01' AND '2026-12-31'
+WHERE created_at >= NOW() - INTERVAL '7 days'  -- за останні 7 днів
+```
+
+---
+
+## Реальні QA приклади
+
+### Перевірити що user зареєструвався
+
+```sql
+-- Після реєстрації через UI або API:
+SELECT id, name, email, created_at, is_verified
+FROM users
+WHERE email = 'test@example.com';
+
+-- Що перевіряємо:
+-- ✅ Запис існує
+-- ✅ name і email відповідають введеним даним
+-- ✅ created_at = сьогодні
+-- ✅ is_verified = false (якщо потрібна верифікація email)
+```
+
+### Перевірити що замовлення створилось
+
+```sql
+SELECT 
+  o.id,
+  o.status,
+  o.total_amount,
+  o.created_at,
+  o.user_id
+FROM orders o
+WHERE o.user_id = 123
+ORDER BY o.created_at DESC
+LIMIT 1;
+
+-- Перевіряємо найновіше замовлення цього user
+```
+
+### Перевірити що пароль змінився (без бачення самого пароля)
+
+```sql
+-- Запам'ятовуємо хеш ДО зміни
+SELECT password_hash FROM users WHERE id = 456;
+-- '...старий_хеш...'
+
+-- Змінюємо пароль через UI
+
+-- Перевіряємо що хеш змінився
+SELECT password_hash FROM users WHERE id = 456;
+-- '...новий_хеш...' (повинен відрізнятись)
+```
+
+---
+
+## ORDER BY і LIMIT
+
+```sql
+-- Сортування за датою (нові спочатку)
+SELECT * FROM orders ORDER BY created_at DESC;
+
+-- Перші 10 записів
+SELECT * FROM users ORDER BY created_at DESC LIMIT 10;
+
+-- Сторінка 2 з 10 записів (пагінація)
+SELECT * FROM users ORDER BY id LIMIT 10 OFFSET 10;
+
+-- Знайти останнє замовлення конкретного user
+SELECT * FROM orders 
+WHERE user_id = 123 
+ORDER BY created_at DESC 
+LIMIT 1;
+```
+
+---
+
+## COUNT, SUM, AVG: агрегатні функції
+
+```sql
+-- Кількість users
+SELECT COUNT(*) FROM users;
+
+-- Кількість активних users
+SELECT COUNT(*) FROM users WHERE is_active = true;
+
+-- Загальна сума замовлень
+SELECT SUM(total_amount) FROM orders WHERE status = 'completed';
+
+-- Середній чек
+SELECT AVG(total_amount) FROM orders WHERE status = 'completed';
+
+-- Кількість замовлень по статусам
+SELECT status, COUNT(*) as count
+FROM orders
+GROUP BY status;
+
+-- Результат:
+-- pending     | 45
+-- processing  | 12
+-- completed   | 234
+-- cancelled   | 8
+```
+
+---
+
+## JOIN: об'єднання таблиць
+
+Найважливіша тема для QA. Реальні дані зберігаються в кількох таблицях.
+
+### INNER JOIN — тільки ті що є в обох таблицях
+
+```sql
+-- Замовлення з іменами users
+SELECT 
+  o.id as order_id,
+  o.total_amount,
+  o.status,
+  u.name as user_name,
+  u.email
+FROM orders o
+INNER JOIN users u ON o.user_id = u.id
+WHERE o.status = 'pending';
+```
+
+### LEFT JOIN — всі з лівої таблиці + відповідні з правої
+
+```sql
+-- Всі users і кількість їх замовлень (включно з тими хто не замовляв)
+SELECT 
+  u.id,
+  u.name,
+  u.email,
+  COUNT(o.id) as orders_count
+FROM users u
+LEFT JOIN orders o ON u.id = o.user_id
+GROUP BY u.id, u.name, u.email
+ORDER BY orders_count DESC;
+```
+
+### Реальний QA приклад: перевірити що order_items правильні
+
+```sql
+-- Після створення замовлення з 2 товарами
+SELECT 
+  o.id as order_id,
+  o.total_amount,
+  oi.product_id,
+  oi.quantity,
+  oi.price,
+  p.name as product_name
+FROM orders o
+JOIN order_items oi ON o.id = oi.order_id
+JOIN products p ON oi.product_id = p.id
+WHERE o.id = 789;
+
+-- Перевіряємо:
+-- ✅ Є 2 рядки (2 товари)
+-- ✅ Quantity і price відповідають тому що вибрали
+-- ✅ total_amount = SUM(oi.quantity * oi.price)
+```
+
+---
+
+## Перевірка цілісності даних
+
+```sql
+-- Orphan records: order_items без orders (баг!)
+SELECT oi.*
+FROM order_items oi
+LEFT JOIN orders o ON oi.order_id = o.id
+WHERE o.id IS NULL;
+
+-- Users з дублікатами email (якщо такого не повинно бути)
+SELECT email, COUNT(*) as count
+FROM users
+GROUP BY email
+HAVING COUNT(*) > 1;
+
+-- Замовлення з нульовою сумою (підозріло)
+SELECT * FROM orders 
+WHERE total_amount = 0 OR total_amount IS NULL;
+
+-- Рядки в невалідному статусі
+SELECT * FROM orders
+WHERE status NOT IN ('pending', 'processing', 'shipped', 'completed', 'cancelled');
+```
+
+---
+
+## Підготовка тест-даних
+
+```sql
+-- Вставка тестового user
+INSERT INTO users (name, email, role, created_at)
+VALUES ('Test User', 'testqa@example.com', 'user', NOW());
+
+-- Масова вставка тестових даних
+INSERT INTO products (name, price, category) VALUES
+  ('Тестовий продукт 1', 100.00, 'electronics'),
+  ('Тестовий продукт 2', 250.00, 'electronics'),
+  ('Тестовий продукт 3', 50.00, 'books');
+
+-- Оновлення для тесту (наприклад, зробити замовлення "старим")
+UPDATE orders
+SET created_at = NOW() - INTERVAL '35 days'
+WHERE id = 789;
+
+-- Видалення тестових даних після тесту
+DELETE FROM users WHERE email LIKE '%testqa%';
+```
+
+⚠️ **Завжди робіть INSERT/UPDATE/DELETE тільки в тестовій БД!** Перед виконанням перевірте до якої бази підключені.
+
+---
+
+## Транзакції: коли тестуєте критичні операції
+
+```sql
+-- Починаємо транзакцію (зміни не застосовуються одразу)
+BEGIN;
+
+-- Робимо тестові зміни
+UPDATE orders SET status = 'cancelled' WHERE id = 789;
+
+-- Перевіряємо результат
+SELECT * FROM orders WHERE id = 789;
+
+-- Якщо все ок — застосовуємо
+COMMIT;
+
+-- Або скасовуємо якщо щось не так
+ROLLBACK;
+```
+
+---
+
+## Практичний чеклист SQL для QA
+
+```
+Базовий рівень (Junior):
+□ SELECT з WHERE і кількома умовами
+□ ORDER BY і LIMIT
+□ COUNT записів
+□ Перевірка NULL значень
+
+Середній рівень (Middle):
+□ JOIN двох таблиць (INNER і LEFT)
+□ GROUP BY з COUNT/SUM
+□ Пошук дублікатів
+□ Дати і часові відрізки
+
+Практика:
+□ Верифікація даних після кожного API тесту
+□ Пошук orphan records
+□ Перевірка цілісності після batch операцій
+```
+
+---
+
+## Де практикуватись
+
+**SQLZoo** (sqlzoo.net) — інтерактивні завдання в браузері, безкоштовно.
+
+**LeetCode SQL** — задачі від простих до складних.
+
+**pgexercises.com** — PostgreSQL-специфічні вправи.
+
+**Реальна практика:** попросіть доступ до тестової БД на роботі або встановіть PostgreSQL локально і практикуйтесь на реальних даних.
+
+---
+
+## Підсумок
+
+Для QA не потрібно знати весь SQL на рівні DBA. Потрібно впевнено писати SELECT запити з умовами, JOIN і базовою агрегацією — і це вже відкриє можливість тестувати на рівні даних, а не тільки UI.
+
+Почніть з SELECT і WHERE, за тиждень практики додайте JOIN — і ви вже будете в топ 30% QA за цим скілом.

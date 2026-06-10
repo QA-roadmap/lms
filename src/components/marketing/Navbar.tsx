@@ -15,16 +15,16 @@ export async function Navbar() {
 
         <div className="hidden items-center gap-8 sm:flex">
           <Link href="/courses" className="nav-link text-sm text-zinc-400 hover:text-white transition-colors">
-            Курси
+            Програми
           </Link>
           <Link href="/skills" className="nav-link text-sm text-zinc-400 hover:text-white transition-colors">
-            Скіли
+            Кар&apos;єрний шлях
           </Link>
           <Link href="/#faq" className="nav-link text-sm text-zinc-400 hover:text-white transition-colors">
-            FAQ
+            Питання та відповіді
           </Link>
           <Link href="/blog" className="nav-link text-sm text-zinc-400 hover:text-white transition-colors">
-            Блог
+            QA Journal
           </Link>
         </div>
 

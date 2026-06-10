@@ -1,0 +1,186 @@
+---
+title: "Інструментарій сучасного QA Engineer: повний огляд"
+description: "Від API-тестування до CI/CD — всі інструменти, які потрібно знати Middle, Senior та Lead QA у 2024 році."
+category: "Інструменти"
+tags: ["QA", "тестування", "інструменти", "Postman", "Playwright", "DevTools"]
+date: 2026-06-10
+---
+
+Якщо ви хочете рости як QA-фахівець або скласти план навчання — перше питання звучить так: **які інструменти варто знати?** Postman вже не достатньо. Сучасний QA охоплює десятки напрямків: від ручного тестування API до навантажувальних тестів, мобільних пристроїв і CI/CD-пайплайнів.
+
+У цій статті — структурований огляд обов'язкового стеку за 10 напрямками, а також мінімальний набір для Middle/Senior QA.
+
+---
+
+## 1. API Testing
+
+API-тестування — одна з ключових компетенцій будь-якого QA. Тут важливо вміти не лише клікати кнопки в Postman, а й автоматизувати перевірки та інтегрувати їх у пайплайни.
+
+| Інструмент | Для чого |
+|---|---|
+| [**Postman**](https://www.postman.com) | Ручне тестування API, колекції, автоматизація через Newman |
+| [**Insomnia**](https://insomnia.rest) | Альтернатива Postman, зручніша для REST/GraphQL |
+| [**Swagger UI**](https://swagger.io/tools/swagger-ui/) | Перевірка API через документацію |
+| [**SoapUI**](https://www.soapui.org) | SOAP та REST тестування |
+| [**Newman**](https://github.com/postmanlabs/newman) | Запуск Postman-колекцій у CI/CD |
+
+> **Порада:** Навчіться писати тести в Postman і запускати їх через Newman у GitHub Actions — це вже буде суттєвою перевагою на співбесіді.
+
+---
+
+## 2. UI Testing
+
+Автоматизація UI-тестів — must-have для тих, хто хоче вирости до Senior або SDET. Playwright зараз де-факто стандарт індустрії.
+
+| Інструмент | Для чого |
+|---|---|
+| [**Playwright**](https://playwright.dev) | Автоматизація вебтестів (рекомендований вибір) |
+| [**Selenium**](https://www.selenium.dev) | Класичний інструмент автоматизації |
+| [**Cypress**](https://www.cypress.io) | E2E тестування фронтенду |
+| [**TestCafe**](https://testcafe.io) | Простий запуск UI-тестів |
+
+---
+
+## 3. DevTools та аналіз мережі
+
+Розуміння мережевого трафіку — це суперсила QA. Ви бачите те, чого не бачить звичайний користувач.
+
+| Інструмент | Для чого |
+|---|---|
+| [**Chrome DevTools**](https://developer.chrome.com/docs/devtools/) | Аналіз DOM, Network, Performance |
+| [**Charles Proxy**](https://www.charlesproxy.com) | Перехоплення HTTP/HTTPS |
+| [**Fiddler**](https://www.telerik.com/fiddler) | Аналіз мережевого трафіку |
+| [**mitmproxy**](https://mitmproxy.org) | CLI-проксі для тестування |
+
+---
+
+## 4. Бази даних
+
+QA, який вміє в SQL, — цінний член команди. Розуміння структури даних допомагає знайти баги, які неможливо знайти через UI.
+
+| Інструмент | Для чого |
+|---|---|
+| [**DBeaver**](https://dbeaver.io) | Універсальний SQL-клієнт (підтримує більшість СУБД) |
+| [**pgAdmin**](https://www.pgadmin.org) | Робота з PostgreSQL |
+| [**MySQL Workbench**](https://www.mysql.com/products/workbench/) | Робота з MySQL |
+| [**SQL Server Management Studio**](https://learn.microsoft.com/en-us/sql/ssms/download-sql-server-management-studio-ssms) | Робота з MS SQL |
+
+---
+
+## 5. Тест-менеджмент
+
+Без системного управління тестуванням навіть найкращі тести губляться в хаосі.
+
+| Інструмент | Для чого |
+|---|---|
+| [**Jira**](https://www.atlassian.com/software/jira) | Управління задачами та дефектами |
+| [**TestRail**](https://www.testrail.com) | Ведення тест-кейсів |
+| [**Zephyr**](https://smartbear.com/test-management/zephyr/) | Тестування всередині Jira |
+| [**Xray**](https://www.getxray.app) | Повноцінний тест-менеджмент у Jira |
+| [**Azure DevOps**](https://azure.microsoft.com/en-us/products/devops/) | Тести, задачі та пайплайни |
+
+---
+
+## 6. Performance Testing
+
+Якщо система падає під навантаженням — її не врятують жодні UI-тести. Розуміння навантажувального тестування відрізняє Mid від Senior.
+
+| Інструмент | Для чого |
+|---|---|
+| [**Apache JMeter**](https://jmeter.apache.org) | Навантажувальне тестування |
+| [**k6**](https://k6.io) | Скриптові навантажувальні тести (сучасна альтернатива) |
+| [**Gatling**](https://gatling.io) | Високопродуктивні навантажувальні тести |
+| [**Sitespeed.io**](https://www.sitespeed.io) | Аналіз продуктивності сайтів |
+
+---
+
+## 7. Mobile Testing
+
+Мобільне тестування — окрема дисципліна зі своїми нюансами: різні версії OS, роздільні здатності, жести.
+
+| Інструмент | Для чого |
+|---|---|
+| [**Appium**](https://appium.io) | Автоматизація Android/iOS |
+| [**Android Studio**](https://developer.android.com/studio) | Емулятори та логи Android |
+| [**Xcode**](https://developer.apple.com/xcode/) | Тестування iOS |
+| [**ADB**](https://developer.android.com/tools/adb) | Робота з Android-пристроями |
+
+---
+
+## 8. CI/CD
+
+QA у 2024 році не може ігнорувати пайплайни. Ваші тести повинні запускатися автоматично — при кожному PR або деплої.
+
+| Інструмент | Для чого |
+|---|---|
+| [**Jenkins**](https://www.jenkins.io) | Автоматичний запуск тестів (класика) |
+| [**GitHub Actions**](https://github.com/features/actions) | CI/CD у GitHub |
+| [**GitLab CI/CD**](https://docs.gitlab.com/ee/ci/) | Пайплайни GitLab |
+| [**TeamCity**](https://www.jetbrains.com/teamcity/) | CI від JetBrains |
+
+---
+
+## 9. Контроль версій
+
+Git — це не опція, це базова навичка. Без Git у 2024 році на роботу не беруть.
+
+| Інструмент | Для чого |
+|---|---|
+| [**Git**](https://git-scm.com) | Базова навичка будь-якого QA |
+| [**SourceTree**](https://www.sourcetreeapp.com) | Графічний інтерфейс для Git |
+| [**GitKraken**](https://www.gitkraken.com) | Зручний Git-клієнт |
+
+---
+
+## 10. Додаткові корисні інструменти
+
+Ці інструменти не обов'язкові для початку, але стають в нагоді у складніших проєктах:
+
+- [**Visual Studio Code**](https://code.visualstudio.com) — робота зі скриптами та JSON
+- [**JSON Formatter**](https://jsonformatter.curiousconcept.com) — форматування та валідація JSON
+- [**jq**](https://jqlang.github.io/jq/) — обробка JSON через командний рядок
+- [**Docker**](https://www.docker.com) — запуск тестових середовищ
+- [**RedisInsight**](https://redis.io/insight/) — перевірка кешу Redis
+- [**RabbitMQ Management**](https://www.rabbitmq.com/docs/management) — перевірка черг повідомлень
+- [**Kafka UI**](https://github.com/provectus/kafka-ui) — аналіз повідомлень Kafka
+
+---
+
+## Мінімальний стек для Middle/Senior QA
+
+Якщо ви не знаєте, з чого почати — ось той набір, який очікують роботодавці від кандидатів на рівень Middle та Senior:
+
+```
+✅ Postman + Newman
+✅ Chrome DevTools
+✅ SQL (DBeaver)
+✅ Jira
+✅ Git
+✅ Playwright або Selenium
+✅ Jenkins / GitHub Actions
+✅ JMeter або k6
+✅ Docker
+```
+
+---
+
+## Що потрібно знати Lead QA
+
+Лід виходить за межі інструментів. Окрім стеку Middle/Senior, від Lead очікують:
+
+- Глибокі знання **CI/CD** та архітектури пайплайнів
+- Розуміння **архітектури інтеграцій** між сервісами
+- Роботу з **брокерами повідомлень**: Kafka, RabbitMQ
+- Побудову **стратегії тестування** для всього продукту
+
+---
+
+## Висновок
+
+Сучасний QA — це не просто "клікер". Це інженер, який розуміє архітектуру системи, вміє автоматизувати перевірки та інтегрувати їх у процеси команди.
+
+**Рекомендований план освоєння:**
+1. Спочатку — Postman, Chrome DevTools, SQL, Git, Jira
+2. Потім — Playwright або Selenium, Newman, GitHub Actions
+3. Далі — JMeter або k6, Docker
+4. Для росту до Lead — Kafka/RabbitMQ, архітектура, стратегія тестування

@@ -1,0 +1,278 @@
+---
+title: "k6 для навантажувального тестування: практичний гайд від старту до CI/CD"
+description: "k6 — сучасний open-source інструмент для performance testing. Пишемо перший скрипт, розуміємо метрики, інтегруємо в GitHub Actions. Чому k6 витісняє JMeter."
+date: "2026-06-10"
+category: "Інструменти"
+tags: ["k6", "Performance Testing", "Load Testing", "CI/CD", "DevOps"]
+level: "Mid-рівень"
+readTime: "14 хв"
+slug: "k6-performance-testing-guide"
+---
+
+# k6 для навантажувального тестування: практичний гайд
+
+JMeter роками був стандартом навантажувального тестування. Але k6, розроблений Grafana Labs, активно переймає позиції — особливо серед команд з DevOps культурою і CI/CD пайплайнами.
+
+У цьому гайді: від встановлення до першого реального тесту і інтеграції в GitHub Actions.
+
+---
+
+## Чому k6, а не JMeter
+
+| | JMeter | k6 |
+|---|---|---|
+| Мова скриптів | Java/Groovy/XML | JavaScript |
+| Інтерфейс | GUI (важкий) | CLI + код |
+| CI/CD інтеграція | Складна | Нативна |
+| Ресурси | Багато RAM | Легкий |
+| Протоколи | HTTP, SOAP, JMS, FTP... | HTTP, WebSocket, gRPC |
+| Open-source | ✅ | ✅ |
+| Grafana інтеграція | Через плагіни | Нативна |
+
+k6 написаний на Go і виконує JS-скрипти. Він споживає набагато менше пам'яті ніж JMeter при тих самих навантаженнях.
+
+---
+
+## Встановлення
+
+```bash
+# macOS
+brew install k6
+
+# Ubuntu/Debian
+sudo gpg -k
+sudo gpg --no-default-keyring --keyring /usr/share/keyrings/k6-archive-keyring.gpg --keyserver hkp://keyserver.ubuntu.com:80 --recv-keys C5AD17C747E3415A3642D57D77C6C491D6AC1D69
+echo "deb [signed-by=/usr/share/keyrings/k6-archive-keyring.gpg] https://dl.k6.io/deb stable main" | sudo tee /etc/apt/sources.list.d/k6.list
+sudo apt-get update
+sudo apt-get install k6
+
+# Windows (через Chocolatey)
+choco install k6
+
+# Docker
+docker run --rm -i grafana/k6 run - <script.js
+```
+
+---
+
+## Перший тест
+
+Створіть файл `basic-load-test.js`:
+
+```javascript
+import http from 'k6/http';
+import { check, sleep } from 'k6';
+
+// Налаштування тесту
+export const options = {
+  vus: 10,          // 10 віртуальних користувачів
+  duration: '30s',  // тривалість 30 секунд
+};
+
+export default function () {
+  // Виконуємо GET запит
+  const response = http.get('https://api.example.com/users');
+
+  // Перевіряємо відповідь
+  check(response, {
+    'status is 200': (r) => r.status === 200,
+    'response time < 500ms': (r) => r.timings.duration < 500,
+    'has users array': (r) => JSON.parse(r.body).users !== undefined,
+  });
+
+  sleep(1); // пауза 1 секунда між ітераціями
+}
+```
+
+Запуск:
+```bash
+k6 run basic-load-test.js
+```
+
+---
+
+## Розуміння метрик
+
+Після виконання k6 виводить метрики:
+
+```
+          /\      |‾‾| /‾‾/   /‾‾/   
+     /\  /  \     |  |/  /   /  /    
+    /  \/    \    |     (   /   ‾‾\  
+   /          \   |  |\  \ |  (‾)  | 
+  / __________ \  |__| \__\ \_____/ .io
+
+  scenarios: (100.00%) 1 scenario, 10 max VUs, 1m0s max duration
+  default: 10 looping VUs for 30s (gracefulStop: 30s)
+
+✓ status is 200
+✓ response time < 500ms  
+✓ has users array
+
+checks.........................: 100.00% ✓ 300  ✗ 0
+data_received..................: 1.2 MB  40 kB/s
+data_sent......................: 45 kB   1.5 kB/s
+http_req_blocked...............: avg=1.2ms    min=1µs    med=3µs    max=65ms   p(90)=5µs    p(95)=9µs   
+http_req_connecting............: avg=456µs    min=0s     med=0s     max=23ms   p(90)=0s     p(95)=0s    
+http_req_duration..............: avg=234ms    min=98ms   med=210ms  max=687ms  p(90)=401ms  p(95)=512ms 
+http_reqs......................: 300     10/s
+iteration_duration.............: avg=1.23s    min=1.1s   med=1.21s  max=1.69s  p(90)=1.41s  p(95)=1.51s
+iterations.....................: 300     10/s
+vus............................: 10      min=10     max=10
+```
+
+**Ключові метрики для розуміння:**
+
+- `http_req_duration` — час відповіді. Дивіться на `p(90)` і `p(95)` — 90-й і 95-й перцентилі. Якщо `p(95) = 512ms` — 95% запитів виконались швидше ніж 512мс.
+- `http_reqs` — кількість запитів на секунду (RPS/TPS)
+- `checks` — скільки перевірок пройшло/впало
+- `vus` — кількість активних віртуальних користувачів
+
+---
+
+## Сценарії навантаження
+
+### Spike test (стрибок навантаження)
+
+```javascript
+export const options = {
+  stages: [
+    { duration: '1m', target: 10 },   // розігрів до 10 users
+    { duration: '10s', target: 200 },  // різкий стрибок до 200
+    { duration: '1m', target: 200 },   // тримаємо навантаження
+    { duration: '10s', target: 0 },    // завершення
+  ],
+};
+```
+
+### Stress test (пошук точки зламу)
+
+```javascript
+export const options = {
+  stages: [
+    { duration: '2m', target: 50 },
+    { duration: '5m', target: 50 },
+    { duration: '2m', target: 100 },
+    { duration: '5m', target: 100 },
+    { duration: '2m', target: 200 },
+    { duration: '5m', target: 200 },
+    { duration: '2m', target: 0 },
+  ],
+};
+```
+
+### Soak test (тест на витривалість)
+
+```javascript
+export const options = {
+  stages: [
+    { duration: '5m', target: 50 },   // розігрів
+    { duration: '8h', target: 50 },   // 8 годин під навантаженням
+    { duration: '5m', target: 0 },    // завершення
+  ],
+};
+```
+
+---
+
+## Тестування API з авторизацією
+
+```javascript
+import http from 'k6/http';
+import { check, sleep } from 'k6';
+
+const BASE_URL = __ENV.BASE_URL || 'https://api.example.com';
+
+// Отримуємо токен один раз на початку
+export function setup() {
+  const loginResponse = http.post(`${BASE_URL}/auth/login`, JSON.stringify({
+    email: 'test@example.com',
+    password: 'testpassword',
+  }), {
+    headers: { 'Content-Type': 'application/json' },
+  });
+
+  const token = JSON.parse(loginResponse.body).access_token;
+  return { token };
+}
+
+export default function (data) {
+  const headers = {
+    'Authorization': `Bearer ${data.token}`,
+    'Content-Type': 'application/json',
+  };
+
+  // Тест на отримання профілю
+  const profileRes = http.get(`${BASE_URL}/profile`, { headers });
+  check(profileRes, {
+    'profile: status 200': (r) => r.status === 200,
+    'profile: has email': (r) => JSON.parse(r.body).email !== undefined,
+  });
+
+  sleep(Math.random() * 2 + 1); // рандомна пауза 1-3 секунди
+}
+```
+
+---
+
+## Інтеграція в GitHub Actions
+
+```yaml
+# .github/workflows/performance.yml
+name: Performance Tests
+
+on:
+  push:
+    branches: [main]
+  schedule:
+    - cron: '0 6 * * 1'  # кожен понеділок о 6:00
+
+jobs:
+  k6-load-test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run k6 load test
+        uses: grafana/k6-action@v0.3.1
+        with:
+          filename: tests/performance/load-test.js
+        env:
+          BASE_URL: ${{ secrets.STAGING_URL }}
+          K6_CLOUD_TOKEN: ${{ secrets.K6_CLOUD_TOKEN }}
+
+      - name: Upload results
+        uses: actions/upload-artifact@v4
+        with:
+          name: k6-results
+          path: results.json
+```
+
+---
+
+## Thresholds: автоматичний фейл при порушенні SLA
+
+```javascript
+export const options = {
+  thresholds: {
+    // 95% запитів швидше за 500мс
+    http_req_duration: ['p(95)<500'],
+    // менше 1% помилок
+    http_req_failed: ['rate<0.01'],
+    // всі checks пройдені
+    checks: ['rate>0.99'],
+  },
+};
+```
+
+Якщо threshold порушено — k6 завершується з exit code 99, CI/CD пайплайн падає. Ідеально для quality gates.
+
+---
+
+## Підсумок
+
+k6 — сучасний вибір для performance testing у 2026. Код як тест, легка CI/CD інтеграція, низьке споживання ресурсів і нативна Grafana інтеграція роблять його кращим варіантом для DevOps-орієнтованих команд.
+
+JMeter залишається актуальним для legacy систем і де потрібна підтримка екзотичних протоколів. Але для нових проектів і команд що прагнуть "testing as code" — k6 є очевидним вибором.
+
+**Наступний крок:** спробуйте запустити базовий тест на вашому staging середовищі і подивіться на перцентилі часу відповіді. Це займе 15 хвилин і дасть реальне розуміння продуктивності вашого API.
