@@ -47,6 +47,28 @@ Access is purchase-based and scoped per course, not global:
   course, the `<Pricing>` block is replaced with a "Ти вже маєш доступ" banner linking to
   `/academy/[slug]`. Auth + purchase check run in parallel via `Promise.all`.
 
+## SEO
+- `src/lib/seo.ts` is the central SEO module: `SITE_URL` (from `NEXT_PUBLIC_APP_URL` if it starts
+  with `http`, else falls back to `https://qaroadmap.dev`), `SITE_NAME = "QA Roadmap"`, and
+  JSON-LD builders `faqSchema`, `courseSchema` (Course + Offer, `offers` omitted unless
+  `typeof course.priceUSD === "number"` — Sanity returns `null` for unset numbers), and
+  `articleSchema`.
+- `src/app/layout.tsx` sets `metadataBase: new URL(SITE_URL)` and a title template
+  (`%s — ${SITE_NAME}`); per-page `generateMetadata`/`metadata` exports add
+  `alternates.canonical`, `openGraph`, and `twitter`. Note: a child segment's `openGraph`/
+  `twitter` object **replaces** the parent's wholesale (no deep merge) — and an `images` key
+  present-but-`undefined` suppresses the auto-injected `opengraph-image` route, so build it with
+  `...(images && { images })`.
+- `app/sitemap.ts` / `app/robots.ts` are dynamic — sitemap combines static routes +
+  `getCourses()` + `getAllPosts()` + `getAllSkillSlugs()`; robots disallows `/academy`, `/api/`,
+  `/sign-in` (also `noindex` via `src/app/academy/layout.tsx` and `sign-in/page.tsx` metadata).
+- `src/lib/og.tsx` provides the shared `OgCard` component + `loadOgFont` (fetches a
+  Cyrillic-glyph-subsetted Inter from the Google Fonts CSS API — Satori/`next/og` needs
+  ttf/otf/woff, no woff2). Used by `opengraph-image.tsx` under `/`, `/courses/[slug]`, and
+  `/blog/[slug]`. When passing text to `loadOgFont`, include the *uppercased* form of any text
+  rendered uppercase in JS (`OgCard` uppercases `eyebrow` itself), or those glyphs render in a
+  fallback font.
+
 ## Layout quirks
 - `src/app/(academy)/academy` and `src/app/(auth)/sign-in` are empty leftover route-group
   directories from a refactor — the live routes are `src/app/academy` and `src/app/sign-in`.
