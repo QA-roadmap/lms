@@ -3,8 +3,7 @@
 import { useState } from "react";
 import { ChevronDown } from "lucide-react";
 import { clsx } from "clsx";
-
-type FAQItem = { q: string; a: string };
+import { faqSchema, type FAQItem } from "@/lib/seo";
 
 const DEFAULT_FAQS: FAQItem[] = [
   {
@@ -46,6 +45,11 @@ export function CourseFAQ({ faqs = DEFAULT_FAQS }: { faqs?: FAQItem[] }) {
 
   return (
     <section id="faq" className="bg-zinc-900/40 px-4 py-20">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(faqSchema(faqs)) }}
+      />
+
       <div className="mx-auto max-w-3xl">
         <div className="mb-12 text-center">
           <p className="mb-3 text-sm font-semibold uppercase tracking-widest text-blue-500">

@@ -1,7 +1,15 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { Navbar } from "@/components/marketing/Navbar";
 import { Footer } from "@/components/marketing/Footer";
 import { SkillsMap } from "@/components/marketing/SkillsMap";
+
+export const metadata: Metadata = {
+  title: "Карта навичок QA-інженера",
+  description:
+    "Які навички реально шукають роботодавці у QA — від основ ручного тестування до AI-інструментів. Пріоритети Must, Key, Bonus та AI-Era.",
+  alternates: { canonical: "/skills" },
+};
 
 export default function SkillsPage() {
   return (

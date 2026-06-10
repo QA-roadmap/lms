@@ -1,5 +1,11 @@
+import type { Metadata } from "next";
 import { signIn } from "@/auth";
 import Link from "next/link";
+
+export const metadata: Metadata = {
+  title: "Вхід",
+  robots: { index: false, follow: false },
+};
 
 export default function SignInPage() {
   return (

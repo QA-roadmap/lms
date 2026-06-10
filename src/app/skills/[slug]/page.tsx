@@ -8,6 +8,7 @@ import type { Metadata } from "next";
 import { Navbar } from "@/components/marketing/Navbar";
 import { Footer } from "@/components/marketing/Footer";
 import { BADGES, getAllSkillSlugs, getSkillCardBySlug, getSkillGuide } from "@/lib/skills";
+import { SITE_NAME } from "@/lib/seo";
 import { extractToc } from "@/lib/toc";
 import { TableOfContents } from "@/components/skills/TableOfContents";
 
@@ -24,6 +25,20 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   return {
     title: card.title,
     description: card.description,
+    alternates: { canonical: `/skills/${slug}` },
+    openGraph: {
+      type: "article",
+      title: card.title,
+      description: card.description,
+      url: `/skills/${slug}`,
+      siteName: SITE_NAME,
+      locale: "uk_UA",
+    },
+    twitter: {
+      card: "summary",
+      title: card.title,
+      description: card.description,
+    },
   };
 }
 

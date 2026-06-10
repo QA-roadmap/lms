@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/ThemeProvider";
+import { SITE_NAME, SITE_URL } from "@/lib/seo";
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -13,10 +14,30 @@ const geistMono = Geist_Mono({
   subsets: ["latin"],
 });
 
+const DEFAULT_TITLE = "QA Roadmap — курси з тестування ПЗ та автоматизації QA";
+const DEFAULT_DESCRIPTION =
+  "Покрокові курси для тих, хто хоче побудувати кар'єру в QA — від основ ручного тестування до автоматизації на Selenium і Playwright.";
+
 export const metadata: Metadata = {
-  title: "QA Roadmap — курси з тестування ПЗ та автоматизації QA",
-  description:
-    "Покрокові курси для тих, хто хоче побудувати кар'єру в QA — від основ ручного тестування до автоматизації на Selenium і Playwright.",
+  metadataBase: new URL(SITE_URL),
+  title: {
+    default: DEFAULT_TITLE,
+    template: `%s — ${SITE_NAME}`,
+  },
+  description: DEFAULT_DESCRIPTION,
+  openGraph: {
+    type: "website",
+    locale: "uk_UA",
+    siteName: SITE_NAME,
+    title: DEFAULT_TITLE,
+    description: DEFAULT_DESCRIPTION,
+    url: "/",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: DEFAULT_TITLE,
+    description: DEFAULT_DESCRIPTION,
+  },
 };
 
 export default function RootLayout({

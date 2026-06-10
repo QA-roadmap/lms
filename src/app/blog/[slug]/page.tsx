@@ -8,6 +8,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ArrowLeft, Clock } from "lucide-react";
 import type { Metadata } from "next";
+import { SITE_NAME, articleSchema } from "@/lib/seo";
 
 type Props = { params: Promise<{ slug: string }> };
 
@@ -15,10 +16,28 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const post = getPost(slug);
   if (!post) return {};
+  const images = post.coverImage ? [post.coverImage] : undefined;
   return {
     title: post.title,
     description: post.excerpt,
-    openGraph: post.coverImage ? { images: [post.coverImage] } : undefined,
+    alternates: { canonical: `/blog/${slug}` },
+    openGraph: {
+      type: "article",
+      title: post.title,
+      description: post.excerpt,
+      url: `/blog/${slug}`,
+      siteName: SITE_NAME,
+      locale: "uk_UA",
+      publishedTime: post.date,
+      tags: post.tags,
+      ...(images && { images }),
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: post.title,
+      description: post.excerpt,
+      ...(images && { images }),
+    },
   };
 }
 
@@ -33,6 +52,21 @@ export default async function BlogPostPage({ params }: Props) {
 
   return (
     <div className="min-h-screen bg-zinc-950">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(
+            articleSchema({
+              title: post.title,
+              description: post.excerpt,
+              slug: post.slug,
+              date: post.date,
+              image: post.coverImage,
+            })
+          ),
+        }}
+      />
+
       <Navbar />
 
       <main className="mx-auto max-w-3xl px-4 py-12">

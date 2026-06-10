@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import Link from "next/link";
 import { Navbar } from "@/components/marketing/Navbar";
@@ -12,6 +13,7 @@ import { Pricing } from "@/components/marketing/Pricing";
 import { getCourses, getCourseBySlug } from "@/lib/sanity";
 import { auth } from "@/auth";
 import { getActiveCourseSlugs } from "@/lib/access";
+import { SITE_NAME, courseSchema } from "@/lib/seo";
 
 type Props = {
   params: Promise<{ slug: string }>;
@@ -20,6 +22,33 @@ type Props = {
 export async function generateStaticParams() {
   const courses = await getCourses();
   return courses.map((course: { slug: string }) => ({ slug: course.slug }));
+}
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { slug } = await params;
+  const course = await getCourseBySlug(slug);
+  if (!course) return {};
+
+  const description = course.tagline ?? course.description;
+
+  return {
+    title: course.title,
+    description,
+    alternates: { canonical: `/courses/${slug}` },
+    openGraph: {
+      type: "website",
+      title: course.title,
+      description,
+      url: `/courses/${slug}`,
+      siteName: SITE_NAME,
+      locale: "uk_UA",
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: course.title,
+      description,
+    },
+  };
 }
 
 export default async function CourseDetailPage({ params }: Props) {
@@ -37,6 +66,11 @@ export default async function CourseDetailPage({ params }: Props) {
 
   return (
     <div className="min-h-screen bg-zinc-950">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(courseSchema(course)) }}
+      />
+
       <Navbar />
 
       {/* Hero */}

@@ -1,7 +1,15 @@
+import type { Metadata } from "next";
 import { getAllPosts } from "@/lib/blog";
 import { Navbar } from "@/components/marketing/Navbar";
 import { Footer } from "@/components/marketing/Footer";
 import { BlogPostsGrid } from "@/components/blog/BlogPostsGrid";
+
+export const metadata: Metadata = {
+  title: "QA Journal — статті та гайди для QA-інженерів",
+  description:
+    "Статті, гайди та практичні поради для QA-інженерів — від основ тестування до AI-інструментів.",
+  alternates: { canonical: "/blog" },
+};
 
 type Props = { searchParams: Promise<{ category?: string }> };
 

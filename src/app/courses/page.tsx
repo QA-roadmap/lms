@@ -1,3 +1,4 @@
+import type { Metadata } from "next";
 import Link from "next/link";
 import { Navbar } from "@/components/marketing/Navbar";
 import { Footer } from "@/components/marketing/Footer";
@@ -16,6 +17,13 @@ import {
   CheckCircle2,
   Lock,
 } from "lucide-react";
+
+export const metadata: Metadata = {
+  title: "Курси з QA та автоматизації тестування",
+  description:
+    "Каталог курсів QA Roadmap — ручне тестування, автоматизація на Selenium і Playwright, API-тестування та AI-інструменти для QA-інженерів.",
+  alternates: { canonical: "/courses" },
+};
 
 function resolveCourseType(course: SanityCourse): "flagship" | "mini" {
   // Once courseType is set in Sanity, use it; otherwise show as flagship
