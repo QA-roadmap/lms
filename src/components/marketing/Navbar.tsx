@@ -2,40 +2,50 @@ import Link from "next/link";
 import { auth } from "@/auth";
 import { SignOutButton } from "@/components/marketing/SignOutButton";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { MobileMenu } from "@/components/marketing/MobileMenu";
+
+const NAV_LINKS = [
+  { href: "/courses", label: "Програми" },
+  { href: "/skills", label: "Кар'єрний шлях" },
+  { href: "/#faq", label: "Питання та відповіді" },
+  { href: "/blog", label: "QA Journal" },
+];
 
 export async function Navbar() {
   const session = await auth();
 
   return (
     <header className="sticky top-0 z-50 border-b border-zinc-800 bg-zinc-950/80 backdrop-blur-sm">
-      <nav className="mx-auto flex max-w-6xl items-center justify-between px-4 py-4">
+      <nav className="relative mx-auto flex max-w-6xl items-center justify-between px-4 py-4">
         <Link href="/" className="nav-logo text-lg font-bold tracking-tight text-white">
           QA<span className="text-blue-500">Roadmap</span>
         </Link>
 
         <div className="hidden items-center gap-8 sm:flex">
-          <Link href="/courses" className="nav-link text-sm text-zinc-400 hover:text-white transition-colors">
-            Програми
-          </Link>
-          <Link href="/skills" className="nav-link text-sm text-zinc-400 hover:text-white transition-colors">
-            Кар&apos;єрний шлях
-          </Link>
-          <Link href="/#faq" className="nav-link text-sm text-zinc-400 hover:text-white transition-colors">
-            Питання та відповіді
-          </Link>
-          <Link href="/blog" className="nav-link text-sm text-zinc-400 hover:text-white transition-colors">
-            QA Journal
-          </Link>
+          {NAV_LINKS.map((link) => (
+            <Link
+              key={link.href}
+              href={link.href}
+              className="nav-link text-sm text-zinc-400 hover:text-white transition-colors"
+            >
+              {link.label}
+            </Link>
+          ))}
         </div>
 
         <div className="flex items-center gap-3">
           <ThemeToggle />
           {session ? (
             <>
-              <Link href="/academy" className="nav-link text-sm text-zinc-400 hover:text-white transition-colors">
+              <Link
+                href="/academy"
+                className="nav-link hidden text-sm text-zinc-400 hover:text-white transition-colors sm:inline-block"
+              >
                 Кабінет
               </Link>
-              <SignOutButton />
+              <div className="hidden sm:block">
+                <SignOutButton />
+              </div>
             </>
           ) : (
             <Link
@@ -45,6 +55,7 @@ export async function Navbar() {
               Увійти
             </Link>
           )}
+          <MobileMenu links={NAV_LINKS} isAuthenticated={!!session} />
         </div>
       </nav>
     </header>

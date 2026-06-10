@@ -44,7 +44,7 @@ export default async function LessonPage({ params }: Props) {
   const prevLesson = modLessons[currentIdx - 1] ?? null;
 
   return (
-    <div className="flex h-screen bg-zinc-950">
+    <div className="flex h-screen flex-col bg-zinc-950 lg:flex-row">
       <Sidebar
         courseSlug={course.slug}
         courseTitle={course.title}
@@ -73,7 +73,7 @@ export default async function LessonPage({ params }: Props) {
             </Link>
           </div>
         ) : (
-          <div className="mx-auto w-full max-w-4xl px-8 py-10">
+          <div className="mx-auto w-full max-w-4xl px-4 py-6 sm:px-8 sm:py-10">
             <div className="mb-2 flex items-center gap-2 text-xs text-zinc-500">
               <span>{mod.code}</span>
               <span>·</span>
@@ -95,7 +95,7 @@ export default async function LessonPage({ params }: Props) {
               )}
             </div>
 
-            <div className="mt-6 flex items-center justify-between">
+            <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               <MarkCompleteButton
                 courseSlug={course.slug}
                 lessonSlug={lesson.slug}
@@ -107,7 +107,7 @@ export default async function LessonPage({ params }: Props) {
                 {prevLesson && (
                   <Link
                     href={`/academy/${course.slug}/${moduleId}/${prevLesson.slug}`}
-                    className="rounded-lg border border-zinc-700 px-4 py-2 text-sm text-zinc-400 hover:text-white transition-colors"
+                    className="flex-1 rounded-lg border border-zinc-700 px-4 py-2 text-center text-sm text-zinc-400 hover:text-white transition-colors sm:flex-none"
                   >
                     ← Попередній
                   </Link>
@@ -115,7 +115,7 @@ export default async function LessonPage({ params }: Props) {
                 {nextLesson && (hasAccess || nextLesson.isFree) && (
                   <Link
                     href={`/academy/${course.slug}/${moduleId}/${nextLesson.slug}`}
-                    className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-medium text-white hover:bg-blue-500 transition-colors"
+                    className="flex-1 rounded-lg bg-blue-600 px-4 py-2 text-center text-sm font-medium text-white hover:bg-blue-500 transition-colors sm:flex-none"
                   >
                     Наступний →
                   </Link>
