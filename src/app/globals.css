@@ -202,10 +202,12 @@ body {
   max-width: 100%;
 }
 
-/* Gated article preview — fades the body into the sign-in prompt below it */
+/* Gated article preview — fades the body into the sign-in prompt below it.
+   Reaches full transparency before the card's overlap zone (-mt-24, ~96px
+   of the 520px box) so the card sits on a clean background, not faded text. */
 .article-fade {
-  -webkit-mask-image: linear-gradient(to bottom, #000 40%, transparent 100%);
-  mask-image: linear-gradient(to bottom, #000 40%, transparent 100%);
+  -webkit-mask-image: linear-gradient(to bottom, #000 45%, transparent 80%);
+  mask-image: linear-gradient(to bottom, #000 45%, transparent 80%);
 }
 
 /* ─── Light theme: article-body ────────────────────────────────────────── */
@@ -394,4 +396,3 @@ html.light .guide-body pre:not([data-language]) code { color: #52525b; }
   border-color: rgba(59,130,246,0.4) !important;
   transform: translateY(-2px);
 }
-
