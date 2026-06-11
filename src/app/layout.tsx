@@ -1,8 +1,11 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
+import { GoogleTagManager } from "@next/third-parties/google";
 import "./globals.css";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { SITE_NAME, SITE_URL } from "@/lib/seo";
+
+const GTM_ID = process.env.NEXT_PUBLIC_GTM_ID;
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -57,6 +60,7 @@ export default function RootLayout({
       <body className="bg-zinc-950 antialiased">
         <ThemeProvider>{children}</ThemeProvider>
       </body>
+      {GTM_ID && <GoogleTagManager gtmId={GTM_ID} />}
     </html>
   );
 }

@@ -69,6 +69,21 @@ Access is purchase-based and scoped per course, not global:
   rendered uppercase in JS (`OgCard` uppercases `eyebrow` itself), or those glyphs render in a
   fallback font.
 
+## Analytics & ads (GTM)
+- Google Tag Manager is the single integration point: `<GoogleTagManager gtmId={...} />` from
+  `@next/third-parties/google` is rendered in `src/app/layout.tsx` only when
+  `NEXT_PUBLIC_GTM_ID` is set. GA4 and the Meta/Facebook Pixel are configured as **tags inside
+  the GTM container** (web UI) — no separate measurement/pixel IDs live in this app.
+- Pageviews for client-side navigation: use GTM's built-in **History Change** trigger (works
+  with Next.js App Router pushState navigation) for the GA4 `page_view` event and the Pixel
+  `PageView` event.
+- Purchases: `src/components/academy/PurchaseTracker.tsx` (rendered in
+  `academy/[courseSlug]/page.tsx`, wrapped in `<Suspense>` for `useSearchParams`) fires a
+  `sendGTMEvent({ event: "purchase", ecommerce: {...} })` once when the Monobank checkout
+  redirect lands with `?payment=success`, dedup'd via `sessionStorage`, then strips the query
+  param. Wire the GA4 `purchase` event tag and the Pixel `Purchase` event tag to a custom
+  trigger on this `purchase` event.
+
 ## Layout quirks
 - `src/app/(academy)/academy` and `src/app/(auth)/sign-in` are empty leftover route-group
   directories from a refactor — the live routes are `src/app/academy` and `src/app/sign-in`.

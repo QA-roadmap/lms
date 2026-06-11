@@ -1,3 +1,4 @@
+import { Suspense } from "react";
 import { auth } from "@/auth";
 import { db } from "@/lib/db";
 import { getActiveCourseSlugs } from "@/lib/access";
@@ -6,6 +7,7 @@ import { courseLessonCount } from "@/lib/courses";
 import { redirect, notFound } from "next/navigation";
 import Link from "next/link";
 import { CheckCircle, Lock, Play } from "lucide-react";
+import { PurchaseTracker } from "@/components/academy/PurchaseTracker";
 
 type Props = {
   params: Promise<{ courseSlug: string }>;
@@ -37,6 +39,13 @@ export default async function CourseDashboardPage({ params }: Props) {
 
   return (
     <div className="min-h-screen bg-zinc-950 px-4 py-12">
+      <Suspense fallback={null}>
+        <PurchaseTracker
+          courseSlug={course.slug}
+          courseTitle={course.title}
+          priceUSD={course.priceUSD ?? 0}
+        />
+      </Suspense>
       <div className="mx-auto max-w-4xl">
         <Link
           href="/academy"
