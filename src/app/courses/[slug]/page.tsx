@@ -97,6 +97,7 @@ export default async function CourseDetailPage({ params }: Props) {
             </p>
           </div>
           <ModuleAccordion
+            courseSlug={course.slug}
             modules={course.modules}
             defaultOpenId={course.modules[0]?._id ?? null}
           />

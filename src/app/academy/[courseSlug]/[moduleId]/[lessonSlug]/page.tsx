@@ -16,22 +16,30 @@ type Props = {
 export default async function LessonPage({ params }: Props) {
   const { courseSlug, moduleId, lessonSlug } = await params;
   const session = await auth();
-  if (!session?.user?.id) redirect("/sign-in");
 
-  const [lesson, course, activeCourseSlugs, progress] = await Promise.all([
+  const [lesson, course] = await Promise.all([
     getLessonPreview(lessonSlug),
     getCourseBySlugPreview(courseSlug),
-    getActiveCourseSlugs(session.user.id),
-    db.userProgress.findMany({
-      where: { userId: session.user.id, courseSlug },
-      select: { lessonSlug: true },
-    }),
   ]);
 
   if (!lesson || !course) notFound();
 
   const mod = course.modules.find((m) => m._id === moduleId);
   if (!mod) notFound();
+
+  if (!lesson.isFree && !session?.user?.id) redirect("/sign-in");
+
+  let activeCourseSlugs = new Set<string>();
+  let progress: { lessonSlug: string }[] = [];
+  if (session?.user?.id) {
+    [activeCourseSlugs, progress] = await Promise.all([
+      getActiveCourseSlugs(session.user.id),
+      db.userProgress.findMany({
+        where: { userId: session.user.id, courseSlug },
+        select: { lessonSlug: true },
+      }),
+    ]);
+  }
 
   const hasAccess = activeCourseSlugs.has(course.slug);
   const isLocked = !lesson.isFree && !hasAccess;
@@ -96,12 +104,21 @@ export default async function LessonPage({ params }: Props) {
             </div>
 
             <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-              <MarkCompleteButton
-                courseSlug={course.slug}
-                lessonSlug={lesson.slug}
-                userId={session.user.id}
-                isCompleted={isCompleted}
-              />
+              {session?.user?.id ? (
+                <MarkCompleteButton
+                  courseSlug={course.slug}
+                  lessonSlug={lesson.slug}
+                  userId={session.user.id}
+                  isCompleted={isCompleted}
+                />
+              ) : (
+                <Link
+                  href="/sign-in"
+                  className="text-sm text-zinc-500 hover:text-white transition-colors"
+                >
+                  Увійти, щоб відстежувати прогрес
+                </Link>
+              )}
 
               <div className="flex gap-3">
                 {prevLesson && (

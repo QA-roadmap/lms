@@ -1,15 +1,18 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { SanityModule } from "@/types/sanity";
 import { Badge } from "@/components/ui/Badge";
 import { ChevronDown, Play, Lock } from "lucide-react";
 import { clsx } from "clsx";
 
 export function ModuleAccordion({
+  courseSlug,
   modules,
   defaultOpenId = null,
 }: {
+  courseSlug: string;
   modules: SanityModule[];
   defaultOpenId?: string | null;
 }) {
@@ -53,28 +56,45 @@ export function ModuleAccordion({
                 <li
                   key={lesson._id}
                   className={clsx(
-                    "flex items-center justify-between px-6 py-3.5",
                     i !== mod.lessons.length - 1 &&
                       "border-b border-zinc-800/60"
                   )}
                 >
-                  <div className="flex items-center gap-3">
-                    {lesson.isFree ? (
-                      <Play className="h-3.5 w-3.5 text-emerald-400" />
-                    ) : (
-                      <Lock className="h-3.5 w-3.5 text-zinc-600" />
-                    )}
-                    <span className="text-sm text-zinc-300">
-                      {lesson.title}
-                    </span>
-                    {lesson.isCapstone && (
-                      <Badge variant="capstone">Capstone</Badge>
-                    )}
-                    {lesson.isFree && <Badge variant="free">Free</Badge>}
-                  </div>
-                  <span className="text-xs text-zinc-600">
-                    {lesson.duration}
-                  </span>
+                  {lesson.isFree ? (
+                    <Link
+                      href={`/academy/${courseSlug}/${mod._id}/${lesson.slug}`}
+                      className="flex items-center justify-between px-6 py-3.5 transition-colors hover:bg-zinc-800/60"
+                    >
+                      <div className="flex items-center gap-3">
+                        <Play className="h-3.5 w-3.5 text-emerald-400" />
+                        <span className="text-sm text-zinc-300">
+                          {lesson.title}
+                        </span>
+                        {lesson.isCapstone && (
+                          <Badge variant="capstone">Capstone</Badge>
+                        )}
+                        <Badge variant="free">Free</Badge>
+                      </div>
+                      <span className="text-xs text-zinc-600">
+                        {lesson.duration}
+                      </span>
+                    </Link>
+                  ) : (
+                    <div className="flex items-center justify-between px-6 py-3.5">
+                      <div className="flex items-center gap-3">
+                        <Lock className="h-3.5 w-3.5 text-zinc-600" />
+                        <span className="text-sm text-zinc-300">
+                          {lesson.title}
+                        </span>
+                        {lesson.isCapstone && (
+                          <Badge variant="capstone">Capstone</Badge>
+                        )}
+                      </div>
+                      <span className="text-xs text-zinc-600">
+                        {lesson.duration}
+                      </span>
+                    </div>
+                  )}
                 </li>
               ))}
             </ul>
