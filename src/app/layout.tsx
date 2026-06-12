@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Geist, Geist_Mono } from "next/font/google";
 import { GoogleTagManager } from "@next/third-parties/google";
+import { VisualEditing } from "next-sanity/visual-editing";
+import { draftMode } from "next/headers";
 import "./globals.css";
 import { ThemeProvider } from "@/components/ThemeProvider";
 import { SITE_NAME, SITE_URL } from "@/lib/seo";
@@ -43,11 +45,13 @@ export const metadata: Metadata = {
   },
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const { isEnabled: isDraftMode } = await draftMode();
+
   return (
     <html lang="uk" className={`${geistSans.variable} ${geistMono.variable}`} suppressHydrationWarning>
       <head>
@@ -59,6 +63,7 @@ export default function RootLayout({
       </head>
       <body className="bg-zinc-950 antialiased">
         <ThemeProvider>{children}</ThemeProvider>
+        {isDraftMode && <VisualEditing />}
       </body>
       {GTM_ID && <GoogleTagManager gtmId={GTM_ID} />}
     </html>

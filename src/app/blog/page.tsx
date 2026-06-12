@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { getAllPosts } from "@/lib/blog";
+import { getAllPosts } from "@/lib/sanity";
 import { Navbar } from "@/components/marketing/Navbar";
 import { Footer } from "@/components/marketing/Footer";
 import { BlogPostsGrid } from "@/components/blog/BlogPostsGrid";
@@ -14,7 +14,7 @@ export const metadata: Metadata = {
 type Props = { searchParams: Promise<{ category?: string }> };
 
 export default async function BlogPage({ searchParams }: Props) {
-  const posts = getAllPosts();
+  const posts = await getAllPosts();
   const { category } = await searchParams;
 
   return (

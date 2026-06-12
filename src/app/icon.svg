@@ -1,0 +1,11 @@
+<svg width="32" height="32" viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+  <rect width="32" height="32" rx="6" fill="#0d1117"/>
+  <rect x="3" y="3" width="26" height="26" rx="5" fill="#161b22"/>
+  <rect x="3" y="3" width="26" height="8" rx="5" fill="#1c2128"/>
+  <rect x="3" y="7" width="26" height="4" fill="#1c2128"/>
+  <circle cx="7" cy="7" r="1.8" fill="#ff5f56"/>
+  <circle cx="12" cy="7" r="1.8" fill="#ffbd2e"/>
+  <circle cx="17" cy="7" r="1.8" fill="#27c93f"/>
+  <text x="16" y="19" text-anchor="middle" fill="#27c93f" font-size="7" font-family="monospace" font-weight="800">QA</text>
+  <text x="16" y="27" text-anchor="middle" fill="#27c93f" font-size="5" font-family="monospace" opacity="0.7">&gt;_</text>
+</svg>

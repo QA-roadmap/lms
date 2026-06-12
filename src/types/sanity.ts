@@ -35,3 +35,15 @@ export type SanityCourse = {
   order?: number;
   modules: SanityModule[];
 };
+
+export type SanityPost = {
+  _id: string;
+  title: string;
+  slug: string;
+  excerpt?: string;
+  category: string;
+  tags: string[];
+  coverImage?: { url: string } | null;
+  publishedAt: string;
+  body?: unknown[];
+};

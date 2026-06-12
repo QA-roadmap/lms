@@ -1,9 +1,9 @@
-import { getPost, getAllPosts, formatDate } from "@/lib/blog";
+import { getPostBySlug, getAllPosts } from "@/lib/sanity";
+import { formatDate, estimateReadingTime } from "@/lib/blog";
 import { Navbar } from "@/components/marketing/Navbar";
 import { Footer } from "@/components/marketing/Footer";
 import { GoogleSignInButton } from "@/components/auth/GoogleSignInButton";
-import { MDXRemote } from "next-mdx-remote/rsc";
-import { mdxOptions } from "@/lib/mdx";
+import { PortableTextContent } from "@/components/PortableTextContent";
 import { auth } from "@/auth";
 import { clsx } from "clsx";
 import Image from "next/image";
@@ -17,9 +17,9 @@ type Props = { params: Promise<{ slug: string }> };
 
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
-  const post = getPost(slug);
+  const post = await getPostBySlug(slug);
   if (!post) return {};
-  const images = post.coverImage ? [post.coverImage] : undefined;
+  const images = post.coverImage ? [post.coverImage.url] : undefined;
   return {
     title: post.title,
     description: post.excerpt,
@@ -31,7 +31,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
       url: `/blog/${slug}`,
       siteName: SITE_NAME,
       locale: "uk_UA",
-      publishedTime: post.date,
+      publishedTime: post.publishedAt,
       tags: post.tags,
       ...(images && { images }),
     },
@@ -44,13 +44,14 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
   };
 }
 
-export function generateStaticParams() {
-  return getAllPosts().map((p) => ({ slug: p.slug }));
+export async function generateStaticParams() {
+  const posts = await getAllPosts();
+  return posts.map((p) => ({ slug: p.slug }));
 }
 
 export default async function BlogPostPage({ params }: Props) {
   const { slug } = await params;
-  const post = getPost(slug);
+  const post = await getPostBySlug(slug);
   if (!post) notFound();
 
   const session = await auth();
@@ -64,10 +65,10 @@ export default async function BlogPostPage({ params }: Props) {
           __html: JSON.stringify(
             articleSchema({
               title: post.title,
-              description: post.excerpt,
+              description: post.excerpt ?? "",
               slug: post.slug,
-              date: post.date,
-              image: post.coverImage,
+              date: post.publishedAt,
+              image: post.coverImage?.url,
             })
           ),
         }}
@@ -107,18 +108,18 @@ export default async function BlogPostPage({ params }: Props) {
         <p className="mt-3 text-lg text-zinc-400">{post.excerpt}</p>
 
         <div className="mt-4 flex items-center gap-3 text-sm text-zinc-500">
-          <span>{formatDate(post.date)}</span>
+          <span>{formatDate(post.publishedAt)}</span>
           <span>·</span>
           <span className="flex items-center gap-1.5">
             <Clock className="h-4 w-4" />
-            {post.readingTime}
+            {estimateReadingTime(post.body)}
           </span>
         </div>
 
         {post.coverImage && (
           <div className="relative mt-8 aspect-video overflow-hidden rounded-2xl">
             <Image
-              src={post.coverImage}
+              src={post.coverImage.url}
               alt={post.title}
               fill
               className="object-cover"
@@ -135,7 +136,7 @@ export default async function BlogPostPage({ params }: Props) {
               !hasAccess && "article-fade max-h-[520px] overflow-hidden"
             )}
           >
-            <MDXRemote source={post.content} options={mdxOptions} />
+            <PortableTextContent content={(post.body ?? []) as import("@portabletext/types").TypedObject[]} />
           </div>
 
           {!hasAccess && (

@@ -1,64 +1,23 @@
-import fs from "fs";
-import path from "path";
-import matter from "gray-matter";
-import readingTime from "reading-time";
-import type { PostMeta, Post } from "./blog-meta";
-
-export type { PostMeta, Post } from "./blog-meta";
-export { formatDate } from "./blog-meta";
-
-const BLOG_DIR = path.join(process.cwd(), "content/blog");
-
-function slugFromFile(filename: string) {
-  return filename.replace(/\.mdx?$/, "");
+export function formatDate(dateStr: string) {
+  return new Date(dateStr).toLocaleDateString("en-US", {
+    year: "numeric",
+    month: "long",
+    day: "numeric",
+  });
 }
 
-export function getAllPosts(): PostMeta[] {
-  if (!fs.existsSync(BLOG_DIR)) return [];
+type PortableTextBlock = { _type?: string; children?: { text?: string }[] };
 
-  return fs
-    .readdirSync(BLOG_DIR)
-    .filter((f) => f.endsWith(".mdx") || f.endsWith(".md"))
-    .map((filename) => {
-      const raw = fs.readFileSync(path.join(BLOG_DIR, filename), "utf8");
-      const { data, content } = matter(raw);
-      return {
-        slug: slugFromFile(filename),
-        title: data.title as string,
-        excerpt: (data.excerpt as string) ?? (data.description as string) ?? "",
-        date: data.date as string,
-        tags: (data.tags as string[]) ?? [],
-        category: (data.category as string) ?? "Інше",
-        coverImage: data.coverImage as string | undefined,
-        readingTime: readingTime(content).text,
-      };
-    })
-    .sort((a, b) => (a.date > b.date ? -1 : 1));
-}
+const WORDS_PER_MINUTE = 200;
 
-export function getPost(slug: string): Post | null {
-  const filePath = path.join(BLOG_DIR, `${slug}.mdx`);
-  const fallback = path.join(BLOG_DIR, `${slug}.md`);
-  const target = fs.existsSync(filePath)
-    ? filePath
-    : fs.existsSync(fallback)
-    ? fallback
-    : null;
+export function estimateReadingTime(body: unknown[] = []): string {
+  const wordCount = (body as PortableTextBlock[])
+    .filter((b) => b._type === "block" && Array.isArray(b.children))
+    .flatMap((b) => b.children!.map((c) => c.text ?? ""))
+    .join(" ")
+    .split(/\s+/)
+    .filter(Boolean).length;
 
-  if (!target) return null;
-
-  const raw = fs.readFileSync(target, "utf8");
-  const { data, content } = matter(raw);
-
-  return {
-    slug,
-    title: data.title as string,
-    excerpt: (data.excerpt as string) ?? (data.description as string) ?? "",
-    date: data.date as string,
-    tags: (data.tags as string[]) ?? [],
-    category: (data.category as string) ?? "Інше",
-    coverImage: data.coverImage as string | undefined,
-    readingTime: readingTime(content).text,
-    content,
-  };
+  const minutes = Math.max(1, Math.round(wordCount / WORDS_PER_MINUTE));
+  return `${minutes} min read`;
 }

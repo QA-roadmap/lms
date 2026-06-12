@@ -1,11 +1,11 @@
 import { auth } from "@/auth";
 import { db } from "@/lib/db";
 import { getActiveCourseSlugs } from "@/lib/access";
-import { getLesson, getCourseBySlug } from "@/lib/sanity";
+import { getLessonPreview, getCourseBySlugPreview } from "@/lib/sanity";
 import { redirect, notFound } from "next/navigation";
 import { Sidebar } from "@/components/academy/Sidebar";
 import { MarkCompleteButton } from "@/components/academy/MarkCompleteButton";
-import { LessonContent } from "@/components/academy/LessonContent";
+import { PortableTextContent } from "@/components/PortableTextContent";
 import { Lock } from "lucide-react";
 import Link from "next/link";
 
@@ -19,8 +19,8 @@ export default async function LessonPage({ params }: Props) {
   if (!session?.user?.id) redirect("/sign-in");
 
   const [lesson, course, activeCourseSlugs, progress] = await Promise.all([
-    getLesson(lessonSlug),
-    getCourseBySlug(courseSlug),
+    getLessonPreview(lessonSlug),
+    getCourseBySlugPreview(courseSlug),
     getActiveCourseSlugs(session.user.id),
     db.userProgress.findMany({
       where: { userId: session.user.id, courseSlug },
@@ -125,7 +125,7 @@ export default async function LessonPage({ params }: Props) {
 
             {lesson.content && (
               <div className="mt-10">
-                <LessonContent content={lesson.content as import("@portabletext/types").TypedObject[]} />
+                <PortableTextContent content={lesson.content as import("@portabletext/types").TypedObject[]} />
               </div>
             )}
           </div>

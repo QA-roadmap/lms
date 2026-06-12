@@ -99,6 +99,41 @@ const components = {
         </figure>
       );
     },
+
+    table: ({ value }: { value: { rows?: { cells?: string[] }[] } }) => {
+      const rows = value?.rows ?? [];
+      if (!rows.length) return null;
+      const [header, ...body] = rows;
+      return (
+        <div className="my-6 overflow-x-auto rounded-xl border border-zinc-800">
+          <table className="w-full border-collapse text-sm">
+            <thead>
+              <tr className="bg-zinc-900">
+                {(header.cells ?? []).map((cell, i) => (
+                  <th
+                    key={i}
+                    className="border-b border-zinc-800 px-4 py-2 text-left font-semibold text-white"
+                  >
+                    {cell}
+                  </th>
+                ))}
+              </tr>
+            </thead>
+            <tbody>
+              {body.map((row, i) => (
+                <tr key={i} className="border-b border-zinc-800 last:border-b-0">
+                  {(row.cells ?? []).map((cell, j) => (
+                    <td key={j} className="px-4 py-2 text-zinc-300">
+                      {cell}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      );
+    },
   },
 
   block: {
@@ -168,7 +203,7 @@ const components = {
   },
 };
 
-export function LessonContent({ content }: Props) {
+export function PortableTextContent({ content }: Props) {
   return (
     <div className="mx-auto max-w-3xl">
       <PortableText value={content} components={components as Partial<PortableTextReactComponents>} />

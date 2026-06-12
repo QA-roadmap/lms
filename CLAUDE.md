@@ -20,17 +20,24 @@ catalog and lesson content.
   everything in try/catch — errors surface as `{ error: string }` JSON (not silent 500s).
   **Token**: must be a merchant/acquiring token from `web.monobank.ua` → Еквайринг section.
   Personal tokens from `api.monobank.ua` return FORBIDDEN on all merchant endpoints.
-- **Blog**: MDX files in `content/blog/` rendered via `next-mdx-remote`/`gray-matter`, plus a
-  Hashnode API mirror (`src/lib/hashnode.ts`, `src/lib/blog.ts`).
+- **Blog**: `post` documents in Sanity (same project/dataset as the course catalog), rendered
+  as Portable Text via `getAllPosts`/`getPostBySlug` (`src/lib/sanity.ts`) and the shared
+  `PortableTextContent` component. `src/lib/blog.ts` holds presentation helpers only
+  (`formatDate`, `estimateReadingTime`).
 - **Styling**: Tailwind v4.
 
 ## Content — Sanity CMS is the only source of truth
 Both the marketing/catalog pages (`/`, `/courses`, `/courses/[slug]`) and the academy/lesson
 pages (`/academy`, `/academy/[courseSlug]/...`) read **live content from Sanity** via
 `src/lib/sanity.ts` (`getCourses`, `getCourseBySlug`, `getModules`, `getLesson`,
-`getModuleByLessonSlug`). There is no parallel static-data catalog — the old
-`src/data/courses.ts` / `src/data/curriculum.ts` fixtures were retired once the full 13-course
-catalog was migrated into Sanity (see Studio schema in the sibling `studio-qa/` project).
+`getModuleByLessonSlug`, `getAllPosts`, `getPostBySlug`). There is no parallel static-data
+catalog — the old `src/data/courses.ts` / `src/data/curriculum.ts` fixtures were retired once
+the full 13-course catalog was migrated into Sanity (see Studio schema in the sibling
+`studio-qa/` project). The blog (`/blog`, `/blog/[slug]`) was migrated the same way: the 14
+posts that previously lived as MDX files in `content/blog/` are now `post` documents in
+Sanity, with Markdown tables converted to `@sanity/table` blocks (plain-text cells — bold/
+links inside table cells were flattened during the one-time migration,
+`scripts/migrate-blog-to-sanity.mjs`).
 
 `src/lib/courses.ts` holds small helpers/derived values only (e.g. `courseLessonCount`,
 `FEATURED_COURSE_SLUG`) — not content.

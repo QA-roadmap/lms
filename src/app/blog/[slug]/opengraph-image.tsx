@@ -1,5 +1,5 @@
 import { ImageResponse } from "next/og";
-import { getPost } from "@/lib/blog";
+import { getPostBySlug } from "@/lib/sanity";
 import { OgCard, ogSize, ogContentType, loadOgFont } from "@/lib/og";
 
 export const size = ogSize;
@@ -9,7 +9,7 @@ type Props = { params: Promise<{ slug: string }> };
 
 export default async function Image({ params }: Props) {
   const { slug } = await params;
-  const post = getPost(slug);
+  const post = await getPostBySlug(slug);
 
   const eyebrow = post?.category ?? "QA Journal";
   const title = post?.title ?? "QA Roadmap";

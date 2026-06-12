@@ -5,7 +5,8 @@ import Image from "next/image";
 import Link from "next/link";
 import { Clock } from "lucide-react";
 import { clsx } from "clsx";
-import { formatDate, type PostMeta } from "@/lib/blog-meta";
+import { formatDate, estimateReadingTime } from "@/lib/blog";
+import type { SanityPost } from "@/types/sanity";
 
 const ALL = "Усі";
 
@@ -21,7 +22,7 @@ export function BlogPostsGrid({
   posts,
   initialCategory,
 }: {
-  posts: PostMeta[];
+  posts: SanityPost[];
   initialCategory?: string;
 }) {
   const categories = useMemo(() => {
@@ -81,7 +82,7 @@ export function BlogPostsGrid({
               {post.coverImage && (
                 <div className="relative aspect-video overflow-hidden">
                   <Image
-                    src={post.coverImage}
+                    src={post.coverImage.url}
                     alt={post.title}
                     fill
                     className="object-cover transition-transform duration-300 group-hover:scale-105"
@@ -114,11 +115,11 @@ export function BlogPostsGrid({
                 </p>
 
                 <div className="mt-4 flex items-center gap-3 text-xs text-zinc-600">
-                  <span>{formatDate(post.date)}</span>
+                  <span>{formatDate(post.publishedAt)}</span>
                   <span>·</span>
                   <span className="flex items-center gap-1">
                     <Clock className="h-3 w-3" />
-                    {post.readingTime}
+                    {estimateReadingTime(post.body)}
                   </span>
                 </div>
               </div>

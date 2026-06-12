@@ -10,7 +10,7 @@ import { ModuleAccordion } from "@/components/marketing/ModuleAccordion";
 import { CourseTestimonials } from "@/components/marketing/CourseTestimonials";
 import { CourseFAQ } from "@/components/marketing/CourseFAQ";
 import { Pricing } from "@/components/marketing/Pricing";
-import { getCourses, getCourseBySlug } from "@/lib/sanity";
+import { getCourses, getCourseBySlug, getCourseBySlugPreview } from "@/lib/sanity";
 import { auth } from "@/auth";
 import { getActiveCourseSlugs } from "@/lib/access";
 import { SITE_NAME, courseSchema } from "@/lib/seo";
@@ -53,7 +53,7 @@ export async function generateMetadata({ params }: Props): Promise<Metadata> {
 
 export default async function CourseDetailPage({ params }: Props) {
   const { slug } = await params;
-  const [course, session] = await Promise.all([getCourseBySlug(slug), auth()]);
+  const [course, session] = await Promise.all([getCourseBySlugPreview(slug), auth()]);
   if (!course) notFound();
 
   const isAvailable = course.status === "available";
