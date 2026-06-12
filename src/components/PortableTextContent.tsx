@@ -4,7 +4,7 @@ import { PortableText, type PortableTextReactComponents } from "next-sanity";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { oneDark } from "react-syntax-highlighter/dist/esm/styles/prism";
 import Image from "next/image";
-import { ChevronDown } from "lucide-react";
+import { ChevronDown, Check, Square } from "lucide-react";
 
 import type { TypedObject } from "@portabletext/types";
 
@@ -146,6 +146,34 @@ const components = {
             />
           </div>
         </details>
+      );
+    },
+
+    checklist: ({
+      value,
+    }: {
+      value: { title?: string; items?: { text?: string; done?: boolean }[] };
+    }) => {
+      const items = value?.items ?? [];
+      if (!items.length) return null;
+      return (
+        <div className="my-6 rounded-xl border border-zinc-800 bg-zinc-900/40 px-5 py-4">
+          {value.title && <p className="mb-3 font-semibold text-white">{value.title}</p>}
+          <ul className="space-y-2">
+            {items.map((item, i) => (
+              <li key={i} className="flex items-start gap-2.5">
+                {item.done ? (
+                  <span className="mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-sm bg-emerald-500/20 text-emerald-400">
+                    <Check className="h-3 w-3" strokeWidth={3} />
+                  </span>
+                ) : (
+                  <Square className="mt-0.5 h-4 w-4 shrink-0 text-zinc-600" strokeWidth={2} />
+                )}
+                <span className={item.done ? "text-zinc-300" : "text-zinc-500"}>{item.text}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
       );
     },
 
