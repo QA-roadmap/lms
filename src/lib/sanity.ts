@@ -91,7 +91,12 @@ const LESSON_PROJECTION = `{
   isFree,
   isCapstone,
   videoUrl,
-  content,
+  content[]{
+    ...,
+    _type == "image" => {
+      "asset": asset->
+    }
+  },
   order
 }`;
 

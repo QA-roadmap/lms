@@ -4,6 +4,7 @@ import { PortableText, type PortableTextReactComponents } from "next-sanity";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { oneDark } from "react-syntax-highlighter/dist/esm/styles/prism";
 import Image from "next/image";
+import { ChevronDown } from "lucide-react";
 
 import type { TypedObject } from "@portabletext/types";
 
@@ -97,6 +98,54 @@ const components = {
             </figcaption>
           )}
         </figure>
+      );
+    },
+
+    callout: ({
+      value,
+    }: {
+      value: { tone?: "info" | "tip" | "warning" | "danger"; content?: TypedObject[] };
+    }) => {
+      if (!value?.content?.length) return null;
+      const tones = {
+        info: { border: "border-blue-500", bg: "bg-blue-500/5", icon: "ℹ️" },
+        tip: { border: "border-emerald-500", bg: "bg-emerald-500/5", icon: "💡" },
+        warning: { border: "border-amber-500", bg: "bg-amber-500/5", icon: "⚠️" },
+        danger: { border: "border-red-500", bg: "bg-red-500/5", icon: "❗" },
+      } as const;
+      const tone = tones[value.tone ?? "info"];
+      return (
+        <div className={`my-6 flex gap-3 rounded-xl border-l-4 ${tone.border} ${tone.bg} px-5 py-4`}>
+          <span className="text-lg leading-7">{tone.icon}</span>
+          <div className="flex-1 [&>*:first-child]:mt-0 [&>*:last-child]:mb-0">
+            <PortableText
+              value={value.content}
+              components={components as Partial<PortableTextReactComponents>}
+            />
+          </div>
+        </div>
+      );
+    },
+
+    accordion: ({
+      value,
+    }: {
+      value: { title?: string; content?: TypedObject[] };
+    }) => {
+      if (!value?.content?.length) return null;
+      return (
+        <details className="group my-6 rounded-xl border border-zinc-800 bg-zinc-900/40 px-5 py-4">
+          <summary className="flex cursor-pointer list-none items-center justify-between font-semibold text-white">
+            {value.title}
+            <ChevronDown className="h-4 w-4 shrink-0 text-zinc-400 transition-transform group-open:rotate-180" />
+          </summary>
+          <div className="mt-4 border-t border-zinc-800 pt-4 [&>*:first-child]:mt-0 [&>*:last-child]:mb-0">
+            <PortableText
+              value={value.content}
+              components={components as Partial<PortableTextReactComponents>}
+            />
+          </div>
+        </details>
       );
     },
 
