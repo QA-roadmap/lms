@@ -1,10 +1,12 @@
 "use client";
 
+import { useEffect, useState } from "react";
 import { PortableText, type PortableTextReactComponents } from "next-sanity";
 import { Prism as SyntaxHighlighter } from "react-syntax-highlighter";
 import { oneDark } from "react-syntax-highlighter/dist/esm/styles/prism";
 import Image from "next/image";
 import { ChevronDown, Check, Square } from "lucide-react";
+import { Switch } from "@/components/ui/Switch";
 
 import type { TypedObject } from "@portabletext/types";
 
@@ -32,6 +34,44 @@ function toYouTubeEmbed(url: string): string | null {
 type Props = {
   content: TypedObject[];
 };
+
+function TaskCallout({ value }: { value: { _key?: string; content?: TypedObject[] } }) {
+  const storageKey = `lesson-task-${value._key ?? ""}`;
+  const [done, setDone] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    setDone(window.localStorage.getItem(storageKey) === "1");
+  }, [storageKey]);
+
+  if (!value?.content?.length) return null;
+
+  const toggle = (next: boolean) => {
+    setDone(next);
+    window.localStorage.setItem(storageKey, next ? "1" : "0");
+  };
+
+  return (
+    <div
+      className={`my-6 flex items-start gap-3 rounded-xl border-l-4 px-5 py-4 transition-colors ${
+        done ? "border-emerald-500 bg-emerald-500/5" : "border-zinc-600 bg-zinc-800/30"
+      }`}
+    >
+      <span className="text-lg leading-7">{done ? "✅" : "📝"}</span>
+      <div
+        className={`flex-1 [&>*:first-child]:mt-0 [&>*:last-child]:mb-0 ${
+          done ? "text-zinc-500 line-through" : ""
+        }`}
+      >
+        <PortableText
+          value={value.content}
+          components={components as Partial<PortableTextReactComponents>}
+        />
+      </div>
+      <Switch checked={done} onChange={toggle} label="Позначити завдання виконаним" />
+    </div>
+  );
+}
 
 const components = {
   types: {
@@ -104,9 +144,16 @@ const components = {
     callout: ({
       value,
     }: {
-      value: { tone?: "info" | "tip" | "warning" | "danger"; content?: TypedObject[] };
+      value: {
+        _key?: string;
+        tone?: "info" | "tip" | "warning" | "danger" | "task";
+        content?: TypedObject[];
+      };
     }) => {
       if (!value?.content?.length) return null;
+      if (value.tone === "task") {
+        return <TaskCallout value={value} />;
+      }
       const tones = {
         info: { border: "border-blue-500", bg: "bg-blue-500/5", icon: "ℹ️" },
         tip: { border: "border-emerald-500", bg: "bg-emerald-500/5", icon: "💡" },
