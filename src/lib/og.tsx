@@ -47,8 +47,11 @@ export function OgCard({
         fontFamily: "Inter",
       }}
     >
-      <div style={{ display: "flex", fontSize: 36, fontWeight: 700, color: "#ffffff" }}>
-        QA<span style={{ color: "#3b82f6" }}>Roadmap</span>
+      <div style={{ display: "flex", fontSize: 36, fontWeight: 700 }}>
+        <span style={{ color: "#AFA9EC" }}>qa</span>
+        <span style={{ color: "#ffffff" }}>road</span>
+        <span style={{ color: "#00FF94" }}>map</span>
+        <span style={{ color: "#BF5FFF" }}>.dev</span>
       </div>
 
       <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>

@@ -9,7 +9,7 @@ const DESCRIPTION =
   "Курси з тестування ПЗ та автоматизації QA — від основ ручного тестування до Selenium і Playwright";
 
 export default async function Image() {
-  const font = await loadOgFont(`QARoadmap${TITLE}${DESCRIPTION}`);
+  const font = await loadOgFont(`qaroadmap.dev${TITLE}${DESCRIPTION}`);
 
   return new ImageResponse(<OgCard title={TITLE} description={DESCRIPTION} />, {
     ...size,

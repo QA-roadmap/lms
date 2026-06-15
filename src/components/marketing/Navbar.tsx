@@ -3,6 +3,7 @@ import { auth } from "@/auth";
 import { SignOutButton } from "@/components/marketing/SignOutButton";
 import { ThemeToggle } from "@/components/ThemeToggle";
 import { MobileMenu } from "@/components/marketing/MobileMenu";
+import { Logo } from "@/components/Logo";
 
 const NAV_LINKS = [
   { href: "/courses", label: "Програми" },
@@ -17,8 +18,8 @@ export async function Navbar() {
   return (
     <header className="sticky top-0 z-50 border-b border-zinc-800 bg-zinc-950/80 backdrop-blur-sm">
       <nav className="relative mx-auto flex max-w-6xl items-center justify-between px-4 py-4">
-        <Link href="/" className="nav-logo text-lg font-bold tracking-tight text-white">
-          QA<span className="text-blue-500">Roadmap</span>
+        <Link href="/" className="nav-logo flex items-center">
+          <Logo className="h-9 w-auto" />
         </Link>
 
         <div className="hidden items-center gap-8 sm:flex">

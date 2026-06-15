@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Logo } from "@/components/Logo";
 
 export function Footer() {
   return (
@@ -6,8 +7,8 @@ export function Footer() {
       <div className="mx-auto max-w-6xl">
         <div className="flex flex-col items-center justify-between gap-6 sm:flex-row">
           <div>
-            <Link href="/" className="text-lg font-bold text-white">
-              QA<span className="text-blue-500">Roadmap</span>
+            <Link href="/" className="inline-flex items-center">
+              <Logo className="h-10 w-auto" />
             </Link>
             <p className="mt-1 text-xs text-zinc-600">
               © {new Date().getFullYear()} QA Roadmap. Усі права захищено.
@@ -30,6 +31,12 @@ export function Footer() {
             <a href="mailto:support@qaroadmap.dev" className="hover:text-white transition-colors">
               Контакти
             </a>
+            <Link href="/privacy" className="hover:text-white transition-colors">
+              Конфіденційність
+            </Link>
+            <Link href="/terms" className="hover:text-white transition-colors">
+              Умови використання
+            </Link>
           </nav>
         </div>
       </div>

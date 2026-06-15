@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 440 90" width="440" height="90">
+
+  <!-- Brand name -->
+  <text x="0" y="58" font-family="'Helvetica Neue', Arial, sans-serif" font-weight="700" font-size="52" letter-spacing="-1">
+    <tspan fill="#AFA9EC">qa</tspan><tspan fill="#ffffff">road</tspan><tspan fill="#00FF94">map</tspan><tspan font-size="28" font-weight="400" fill="#BF5FFF" letter-spacing="1">.dev</tspan>
+  </text>
+
+  <!-- Tagline -->
+  <text x="2" y="80" font-family="'Helvetica Neue', Arial, sans-serif" font-weight="400" font-size="12" fill="#ffffff" fill-opacity="0.45" letter-spacing="2.8">YOUR PATH IN QA ENGINEERING</text>
+
+</svg>

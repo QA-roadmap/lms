@@ -15,7 +15,7 @@ export default async function Image({ params }: Props) {
   const title = course?.title ?? "QA Roadmap";
   const description = course?.tagline ?? course?.description;
 
-  const font = await loadOgFont(`${eyebrow.toUpperCase()}${title}${description ?? ""}QARoadmap`);
+  const font = await loadOgFont(`${eyebrow.toUpperCase()}${title}${description ?? ""}qaroadmap.dev`);
 
   return new ImageResponse(<OgCard eyebrow={eyebrow} title={title} description={description} />, {
     ...size,
