@@ -31,7 +31,7 @@ const MODULE_PROJECTION = `{
   code,
   description,
   order,
-  "lessons": lessons[]-> {
+  "lessons": coalesce((lessons[]-> {
     _id,
     title,
     "slug": slug.current,
@@ -40,7 +40,7 @@ const MODULE_PROJECTION = `{
     isCapstone,
     videoUrl,
     order
-  } | order(order asc)
+  })[defined(_id)] | order(order asc), [])
 }`;
 
 const COURSE_PROJECTION = `{
@@ -53,7 +53,7 @@ const COURSE_PROJECTION = `{
   courseType,
   priceUSD,
   order,
-  "modules": modules[]-> ${MODULE_PROJECTION} | order(order asc)
+  "modules": coalesce((modules[]-> ${MODULE_PROJECTION})[defined(_id)] | order(order asc), [])
 }`;
 
 export async function getCourses(): Promise<SanityCourse[]> {
