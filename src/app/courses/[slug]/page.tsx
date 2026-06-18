@@ -5,6 +5,7 @@ import { Navbar } from "@/components/marketing/Navbar";
 import { Footer } from "@/components/marketing/Footer";
 import { CourseHero } from "@/components/marketing/CourseHero";
 import { CourseForWhom } from "@/components/marketing/CourseForWhom";
+import { CourseOutcomes } from "@/components/marketing/CourseOutcomes";
 import { CourseSkillsSection } from "@/components/marketing/CourseSkillsSection";
 import { ModuleAccordion } from "@/components/marketing/ModuleAccordion";
 import { CourseTestimonials } from "@/components/marketing/CourseTestimonials";
@@ -75,6 +76,9 @@ export default async function CourseDetailPage({ params }: Props) {
 
       {/* Hero */}
       <CourseHero course={course} />
+
+      {/* After the course */}
+      <CourseOutcomes outcomes={course.outcomes} />
 
       {/* For whom */}
       <CourseForWhom />

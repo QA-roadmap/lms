@@ -73,6 +73,67 @@ function TaskCallout({ value }: { value: { _key?: string; content?: TypedObject[
   );
 }
 
+function Checklist({
+  value,
+}: {
+  value: { _key?: string; title?: string; items?: { _key?: string; text?: string; done?: boolean }[] };
+}) {
+  const items = value?.items ?? [];
+  const [doneMap, setDoneMap] = useState<Record<string, boolean>>({});
+
+  useEffect(() => {
+    if (typeof window === "undefined") return;
+    const initial: Record<string, boolean> = {};
+    items.forEach((item, i) => {
+      const storageKey = `lesson-checklist-${value._key ?? ""}-${item._key ?? i}`;
+      const stored = window.localStorage.getItem(storageKey);
+      initial[storageKey] = stored === null ? !!item.done : stored === "1";
+    });
+    setDoneMap(initial);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [value._key]);
+
+  if (!items.length) return null;
+
+  const toggle = (storageKey: string) => {
+    const next = !doneMap[storageKey];
+    setDoneMap((prev) => ({ ...prev, [storageKey]: next }));
+    window.localStorage.setItem(storageKey, next ? "1" : "0");
+  };
+
+  return (
+    <div className="my-6 rounded-xl border border-zinc-800 bg-zinc-900/40 px-5 py-4">
+      {value.title && <p className="mb-3 font-semibold text-white">{value.title}</p>}
+      <ul className="space-y-2">
+        {items.map((item, i) => {
+          const storageKey = `lesson-checklist-${value._key ?? ""}-${item._key ?? i}`;
+          const done = doneMap[storageKey] ?? !!item.done;
+          return (
+            <li key={storageKey}>
+              <button
+                type="button"
+                onClick={() => toggle(storageKey)}
+                className="flex w-full items-start gap-2.5 text-left"
+              >
+                {done ? (
+                  <span className="mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-sm bg-emerald-500/20 text-emerald-400">
+                    <Check className="h-3 w-3" strokeWidth={3} />
+                  </span>
+                ) : (
+                  <Square className="mt-0.5 h-4 w-4 shrink-0 text-zinc-600" strokeWidth={2} />
+                )}
+                <span className={done ? "text-zinc-300 line-through" : "text-zinc-500"}>
+                  {item.text}
+                </span>
+              </button>
+            </li>
+          );
+        })}
+      </ul>
+    </div>
+  );
+}
+
 const components = {
   types: {
     code: ({ value }: { value: { code: string; language?: string; filename?: string } }) => (
@@ -196,33 +257,9 @@ const components = {
       );
     },
 
-    checklist: ({
-      value,
-    }: {
-      value: { title?: string; items?: { text?: string; done?: boolean }[] };
-    }) => {
-      const items = value?.items ?? [];
-      if (!items.length) return null;
-      return (
-        <div className="my-6 rounded-xl border border-zinc-800 bg-zinc-900/40 px-5 py-4">
-          {value.title && <p className="mb-3 font-semibold text-white">{value.title}</p>}
-          <ul className="space-y-2">
-            {items.map((item, i) => (
-              <li key={i} className="flex items-start gap-2.5">
-                {item.done ? (
-                  <span className="mt-0.5 flex h-4 w-4 shrink-0 items-center justify-center rounded-sm bg-emerald-500/20 text-emerald-400">
-                    <Check className="h-3 w-3" strokeWidth={3} />
-                  </span>
-                ) : (
-                  <Square className="mt-0.5 h-4 w-4 shrink-0 text-zinc-600" strokeWidth={2} />
-                )}
-                <span className={item.done ? "text-zinc-300" : "text-zinc-500"}>{item.text}</span>
-              </li>
-            ))}
-          </ul>
-        </div>
-      );
-    },
+    checklist: ({ value }: { value: { _key?: string; title?: string; items?: { _key?: string; text?: string; done?: boolean }[] } }) => (
+      <Checklist value={value} />
+    ),
 
     table: ({ value }: { value: { rows?: { cells?: string[] }[] } }) => {
       const rows = value?.rows ?? [];
