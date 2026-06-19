@@ -89,19 +89,31 @@ export default async function LessonPage({ params }: Props) {
             </div>
             <h1 className="text-2xl font-bold text-white">{lesson.title}</h1>
 
-            <div className="mt-6 aspect-video overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900">
-              {lesson.videoUrl ? (
-                <iframe
-                  src={lesson.videoUrl}
-                  className="h-full w-full"
-                  allowFullScreen
-                />
-              ) : (
-                <div className="flex h-full items-center justify-center">
-                  <p className="text-zinc-600">Відео скоро буде</p>
+            {lesson.videoUrl ? (
+              <>
+                <div className="mt-6 aspect-video overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900">
+                  <iframe
+                    src={lesson.videoUrl}
+                    className="h-full w-full"
+                    allowFullScreen
+                  />
                 </div>
-              )}
-            </div>
+                {lesson.presentationUrl && (
+                  <a
+                    href={lesson.presentationUrl}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="mt-3 inline-flex items-center gap-2 text-sm text-zinc-400 hover:text-white transition-colors"
+                  >
+                    📄 Переглянути презентацію
+                  </a>
+                )}
+              </>
+            ) : lesson.presentationUrl ? (
+              <div className="mt-6 aspect-video overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900">
+                <iframe src={lesson.presentationUrl} className="h-full w-full" />
+              </div>
+            ) : null}
 
             <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
               {session?.user?.id ? (

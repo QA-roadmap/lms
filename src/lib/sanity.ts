@@ -92,6 +92,7 @@ const LESSON_PROJECTION = `{
   isFree,
   isCapstone,
   videoUrl,
+  "presentationUrl": presentationFile.asset->url,
   content[]{
     ...,
     _type == "image" => {

@@ -6,6 +6,7 @@ export type SanityLesson = {
   isFree: boolean;
   isCapstone?: boolean;
   videoUrl?: string;
+  presentationUrl?: string | null;
   content?: unknown[];
   order?: number;
 };
