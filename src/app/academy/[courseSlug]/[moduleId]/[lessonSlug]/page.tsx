@@ -81,13 +81,15 @@ export default async function LessonPage({ params }: Props) {
             </Link>
           </div>
         ) : (
-          <div className="mx-auto w-full max-w-4xl px-4 py-6 sm:px-8 sm:py-10">
-            <div className="mb-2 flex items-center gap-2 text-xs text-zinc-500">
-              <span>{mod.code}</span>
-              <span>·</span>
-              <span>{lesson.duration}</span>
+          <div className="mx-auto w-full max-w-6xl px-4 py-6 sm:px-8 sm:py-10">
+            <div className="mx-auto max-w-4xl">
+              <div className="mb-2 flex items-center gap-2 text-xs text-zinc-500">
+                <span>{mod.code}</span>
+                <span>·</span>
+                <span>{lesson.duration}</span>
+              </div>
+              <h1 className="text-2xl font-bold text-white">{lesson.title}</h1>
             </div>
-            <h1 className="text-2xl font-bold text-white">{lesson.title}</h1>
 
             {lesson.videoUrl ? (
               <>
@@ -115,48 +117,50 @@ export default async function LessonPage({ params }: Props) {
               </div>
             ) : null}
 
-            <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
-              {session?.user?.id ? (
-                <MarkCompleteButton
-                  courseSlug={course.slug}
-                  lessonSlug={lesson.slug}
-                  userId={session.user.id}
-                  isCompleted={isCompleted}
-                />
-              ) : (
-                <Link
-                  href="/sign-in"
-                  className="text-sm text-zinc-500 hover:text-white transition-colors"
-                >
-                  Увійти, щоб відстежувати прогрес
-                </Link>
+            <div className="mx-auto max-w-4xl">
+              <div className="mt-6 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+                {session?.user?.id ? (
+                  <MarkCompleteButton
+                    courseSlug={course.slug}
+                    lessonSlug={lesson.slug}
+                    userId={session.user.id}
+                    isCompleted={isCompleted}
+                  />
+                ) : (
+                  <Link
+                    href="/sign-in"
+                    className="text-sm text-zinc-500 hover:text-white transition-colors"
+                  >
+                    Увійти, щоб відстежувати прогрес
+                  </Link>
+                )}
+
+                <div className="flex gap-3">
+                  {prevLesson && (
+                    <Link
+                      href={`/academy/${course.slug}/${moduleId}/${prevLesson.slug}`}
+                      className="flex-1 rounded-lg border border-zinc-700 px-4 py-2 text-center text-sm text-zinc-400 hover:text-white transition-colors sm:flex-none"
+                    >
+                      ← Попередній
+                    </Link>
+                  )}
+                  {nextLesson && (hasAccess || nextLesson.isFree) && (
+                    <Link
+                      href={`/academy/${course.slug}/${moduleId}/${nextLesson.slug}`}
+                      className="flex-1 rounded-lg bg-blue-600 px-4 py-2 text-center text-sm font-medium text-white hover:bg-blue-500 transition-colors sm:flex-none"
+                    >
+                      Наступний →
+                    </Link>
+                  )}
+                </div>
+              </div>
+
+              {lesson.content && (
+                <div className="mt-10">
+                  <PortableTextContent content={lesson.content as import("@portabletext/types").TypedObject[]} />
+                </div>
               )}
-
-              <div className="flex gap-3">
-                {prevLesson && (
-                  <Link
-                    href={`/academy/${course.slug}/${moduleId}/${prevLesson.slug}`}
-                    className="flex-1 rounded-lg border border-zinc-700 px-4 py-2 text-center text-sm text-zinc-400 hover:text-white transition-colors sm:flex-none"
-                  >
-                    ← Попередній
-                  </Link>
-                )}
-                {nextLesson && (hasAccess || nextLesson.isFree) && (
-                  <Link
-                    href={`/academy/${course.slug}/${moduleId}/${nextLesson.slug}`}
-                    className="flex-1 rounded-lg bg-blue-600 px-4 py-2 text-center text-sm font-medium text-white hover:bg-blue-500 transition-colors sm:flex-none"
-                  >
-                    Наступний →
-                  </Link>
-                )}
-              </div>
             </div>
-
-            {lesson.content && (
-              <div className="mt-10">
-                <PortableTextContent content={lesson.content as import("@portabletext/types").TypedObject[]} />
-              </div>
-            )}
           </div>
         )}
       </main>
