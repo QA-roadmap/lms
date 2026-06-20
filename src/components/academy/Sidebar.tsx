@@ -17,9 +17,12 @@ type Props = {
 
 export function Sidebar({ courseSlug, courseTitle, modules, completedSlugs, hasAccess }: Props) {
   const pathname = usePathname();
-  const [openModule, setOpenModule] = useState<string | null>(
-    modules[0]?._id ?? null
-  );
+  const [openModule, setOpenModule] = useState<string | null>(() => {
+    const activeModule = modules.find((mod) =>
+      (mod.lessons ?? []).some((lesson) => pathname.includes(lesson.slug))
+    );
+    return activeModule?._id ?? modules[0]?._id ?? null;
+  });
   const [mobileOpen, setMobileOpen] = useState(false);
 
   return (
