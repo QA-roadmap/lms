@@ -5,6 +5,8 @@ import { Footer } from "@/components/marketing/Footer";
 import { CourseTestimonials } from "@/components/marketing/CourseTestimonials";
 import { getCourses } from "@/lib/sanity";
 import { courseLessonCount } from "@/lib/courses";
+import { auth } from "@/auth";
+import { getActiveCourseSlugs } from "@/lib/access";
 import type { SanityCourse } from "@/types/sanity";
 import {
   ArrowRight,
@@ -33,9 +35,13 @@ function resolveCourseType(course: SanityCourse): "flagship" | "mini" {
 function FlagshipCard({
   course,
   index,
+  isPurchased,
+  isDimmed,
 }: {
   course: SanityCourse;
   index: number;
+  isPurchased: boolean;
+  isDimmed: boolean;
 }) {
   const lessonCount = courseLessonCount(course);
   const isAvailable = course.status === "available";
@@ -49,8 +55,14 @@ function FlagshipCard({
   ];
   const accent = accentColors[index % accentColors.length];
 
+  const wrapperClass = isPurchased
+    ? "group relative overflow-hidden rounded-2xl border-2 border-emerald-500/40 bg-zinc-900 shadow-lg shadow-emerald-500/10 transition-all duration-300 hover:border-emerald-400/60 hover:shadow-xl hover:shadow-emerald-500/20"
+    : `group relative overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900 transition-all duration-300 hover:border-zinc-600 hover:shadow-xl hover:shadow-black/40 ${
+        isDimmed ? "opacity-60 saturate-[0.5] hover:opacity-100 hover:saturate-100" : ""
+      }`;
+
   return (
-    <div className="group relative overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900 transition-all duration-300 hover:border-zinc-600 hover:shadow-xl hover:shadow-black/40">
+    <div className={wrapperClass}>
       {/* Top gradient bar */}
       <div className={`h-1 w-full bg-gradient-to-r ${accent}`} />
 
@@ -64,7 +76,11 @@ function FlagshipCard({
               >
                 КУРС {code}
               </span>
-              {isAvailable ? (
+              {isPurchased ? (
+                <span className="inline-flex items-center gap-1 rounded-full border border-emerald-500/40 bg-emerald-500/15 px-2.5 py-0.5 text-xs font-semibold text-emerald-400">
+                  <Trophy className="h-3 w-3" /> Твій курс
+                </span>
+              ) : isAvailable ? (
                 <span className="inline-flex items-center gap-1 rounded-full border border-emerald-500/30 bg-emerald-500/10 px-2.5 py-0.5 text-xs font-medium text-emerald-400">
                   <CheckCircle2 className="h-3 w-3" /> Доступний
                 </span>
@@ -105,7 +121,15 @@ function FlagshipCard({
 
           {/* Right: CTA */}
           <div className="flex shrink-0 items-center sm:pt-2">
-            {isAvailable ? (
+            {isPurchased ? (
+              <Link
+                href={`/academy/${course.slug}`}
+                className="group/btn inline-flex items-center gap-2 rounded-xl bg-gradient-to-r from-emerald-600 to-teal-600 px-5 py-2.5 text-sm font-semibold text-white shadow-lg transition-all duration-200 hover:opacity-90 hover:shadow-xl"
+              >
+                Продовжити навчання
+                <ArrowRight className="h-4 w-4 transition-transform group-hover/btn:translate-x-0.5" />
+              </Link>
+            ) : isAvailable ? (
               <Link
                 href={`/courses/${course.slug}`}
                 className={`group/btn inline-flex items-center gap-2 rounded-xl bg-gradient-to-r ${accent} px-5 py-2.5 text-sm font-semibold text-white shadow-lg transition-all duration-200 hover:opacity-90 hover:shadow-xl`}
@@ -194,9 +218,23 @@ function MiniCard({
 }
 
 export default async function CoursesPage() {
-  const courses: SanityCourse[] = await getCourses();
+  const [courses, session] = await Promise.all([getCourses(), auth()]);
 
-  const flagship = courses.filter((c) => resolveCourseType(c) === "flagship");
+  let activeCourseSlugs = new Set<string>();
+  if (session?.user?.id) {
+    activeCourseSlugs = await getActiveCourseSlugs(session.user.id);
+  }
+  const hasAnyPurchase = activeCourseSlugs.size > 0;
+
+  const unsortedFlagship = courses.filter(
+    (c) => resolveCourseType(c) === "flagship"
+  );
+  // Purchased course surfaces first among the flagship courses.
+  const flagship = [...unsortedFlagship].sort((a, b) => {
+    const aRank = activeCourseSlugs.has(a.slug) ? 0 : 1;
+    const bRank = activeCourseSlugs.has(b.slug) ? 0 : 1;
+    return aRank - bRank;
+  });
   const mini = courses.filter((c) => resolveCourseType(c) === "mini");
 
   const totalLessons = courses.reduce(
@@ -295,9 +333,18 @@ export default async function CoursesPage() {
             </div>
 
             <div className="space-y-4">
-              {flagship.map((course, i) => (
-                <FlagshipCard key={course.slug} course={course} index={i} />
-              ))}
+              {flagship.map((course, i) => {
+                const isPurchased = activeCourseSlugs.has(course.slug);
+                return (
+                  <FlagshipCard
+                    key={course.slug}
+                    course={course}
+                    index={i}
+                    isPurchased={isPurchased}
+                    isDimmed={hasAnyPurchase && !isPurchased}
+                  />
+                );
+              })}
             </div>
           </section>
         )}
@@ -332,9 +379,18 @@ export default async function CoursesPage() {
         {flagship.length === 0 && mini.length === 0 && (
           <section className="mx-auto max-w-5xl px-4 pb-16">
             <div className="space-y-3">
-              {courses.map((course, i) => (
-                <FlagshipCard key={course.slug} course={course} index={i} />
-              ))}
+              {courses.map((course, i) => {
+                const isPurchased = activeCourseSlugs.has(course.slug);
+                return (
+                  <FlagshipCard
+                    key={course.slug}
+                    course={course}
+                    index={i}
+                    isPurchased={isPurchased}
+                    isDimmed={hasAnyPurchase && !isPurchased}
+                  />
+                );
+              })}
             </div>
           </section>
         )}
