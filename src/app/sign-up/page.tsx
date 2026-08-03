@@ -1,15 +1,15 @@
 import type { Metadata } from "next";
 import { GoogleSignInButton } from "@/components/auth/GoogleSignInButton";
-import { EmailPasswordSignInForm } from "@/components/auth/EmailPasswordSignInForm";
+import { SignUpForm } from "@/components/auth/SignUpForm";
 import Link from "next/link";
 import { Logo } from "@/components/Logo";
 
 export const metadata: Metadata = {
-  title: "Вхід",
+  title: "Реєстрація",
   robots: { index: false, follow: false },
 };
 
-export default function SignInPage() {
+export default function SignUpPage() {
   return (
     <div className="flex min-h-screen flex-col items-center justify-center bg-zinc-950 px-4">
       <Link href="/" className="mb-12">
@@ -17,13 +17,13 @@ export default function SignInPage() {
       </Link>
 
       <div className="w-full max-w-sm rounded-2xl border border-zinc-800 bg-zinc-900 p-8">
-        <h1 className="text-xl font-semibold text-white">Вхід</h1>
+        <h1 className="text-xl font-semibold text-white">Реєстрація</h1>
         <p className="mt-2 text-sm text-zinc-400">
-          Увійдіть, щоб перейти до свого кабінету
+          Створіть акаунт, щоб отримати доступ до курсів
         </p>
 
         <div className="mt-8">
-          <GoogleSignInButton redirectTo="/academy" />
+          <GoogleSignInButton redirectTo="/academy" label="Зареєструватися через Google" />
         </div>
 
         <div className="my-6 flex items-center gap-3">
@@ -32,17 +32,17 @@ export default function SignInPage() {
           <div className="h-px flex-1 bg-zinc-800" />
         </div>
 
-        <EmailPasswordSignInForm redirectTo="/academy" />
+        <SignUpForm redirectTo="/academy" />
 
         <p className="mt-6 text-center text-sm text-zinc-400">
-          Немає акаунту?{" "}
-          <Link href="/sign-up" className="text-white underline hover:text-zinc-300">
-            Зареєструватися
+          Вже маєте акаунт?{" "}
+          <Link href="/sign-in" className="text-white underline hover:text-zinc-300">
+            Увійти
           </Link>
         </p>
 
         <p className="mt-6 text-center text-xs text-zinc-600">
-          Входячи, ви погоджуєтесь з{" "}
+          Реєструючись, ви погоджуєтесь з{" "}
           <Link href="/terms" className="underline hover:text-zinc-400">
             умовами використання
           </Link>{" "}
