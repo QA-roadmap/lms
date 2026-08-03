@@ -52,6 +52,7 @@ const COURSE_PROJECTION = `{
   status,
   courseType,
   priceUSD,
+  compareAtPriceUSD,
   outcomes,
   order,
   "modules": coalesce((modules[]-> ${MODULE_PROJECTION})[defined(_id)] | order(order asc), [])

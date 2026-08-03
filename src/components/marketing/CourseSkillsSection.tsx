@@ -1,25 +1,20 @@
 import Link from "next/link";
 import { TIERS, BADGES, type SkillCard } from "@/lib/skills";
-import { COURSE_SKILL_SLUGS } from "@/lib/courseSkills";
 
 type ResolvedSkill = SkillCard & { tier: string };
 
-function resolveSkills(courseSlug: string): ResolvedSkill[] {
-  const slugs = COURSE_SKILL_SLUGS[courseSlug] ?? [];
+function resolveSkills(): ResolvedSkill[] {
   const result: ResolvedSkill[] = [];
   for (const tier of TIERS) {
     for (const card of tier.cards) {
-      if (card.slug && slugs.includes(card.slug)) {
-        result.push({ ...card, tier: tier.title });
-      }
+      result.push({ ...card, tier: tier.title });
     }
   }
   return result;
 }
 
-export function CourseSkillsSection({ courseSlug }: { courseSlug: string }) {
-  const skills = resolveSkills(courseSlug);
-  if (skills.length === 0) return null;
+export function CourseSkillsSection() {
+  const skills = resolveSkills();
 
   return (
     <section className="bg-zinc-900/40 px-4 py-20">
@@ -29,14 +24,12 @@ export function CourseSkillsSection({ courseSlug }: { courseSlug: string }) {
             Навички
           </p>
           <h2 className="text-3xl font-bold tracking-tight text-white sm:text-4xl">
-            Що ти освоїш у цьому курсі
+            Скіли QA-тестувальника у 2026
           </h2>
           <p className="mx-auto mt-4 max-w-xl text-zinc-400">
-            Кожен модуль прив'язаний до конкретних навичок з{" "}
-            <Link href="/skills" className="text-blue-400 hover:underline">
-              карти скілів QA 2026
-            </Link>
-            {" "}— так ти завжди бачиш, де знаходишся і що ще попереду.
+            Карта навичок, які реально шукають роботодавці — від основ ручного тестування до
+            AI-ери. Бейджі показують пріоритет: Must — база, без якої не візьмуть, Key —
+            конкурентна перевага, +Бонус — для росту, AI-Era — новий стандарт 2025–26.
           </p>
         </div>
 

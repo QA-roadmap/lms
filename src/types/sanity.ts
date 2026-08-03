@@ -33,6 +33,7 @@ export type SanityCourse = {
   status: SanityCourseStatus;
   courseType?: SanityCourseType;
   priceUSD?: number;
+  compareAtPriceUSD?: number;
   outcomes?: string[];
   order?: number;
   modules: SanityModule[];

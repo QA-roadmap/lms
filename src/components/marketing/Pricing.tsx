@@ -26,7 +26,7 @@ export function Pricing({ course, hasPurchased }: Props) {
 
   if (course.priceUSD === undefined) return null;
   const price = course.priceUSD;
-  const originalPrice = Math.ceil((price * 1.52) / 10) * 10;
+  const originalPrice = course.compareAtPriceUSD ?? Math.ceil((price * 1.52) / 10) * 10;
   const discountPct = Math.round((1 - price / originalPrice) * 100);
   const uahPrice = Math.round(price * 41);
 

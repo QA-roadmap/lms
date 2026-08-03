@@ -83,9 +83,6 @@ export default async function CourseDetailPage({ params }: Props) {
       {/* For whom */}
       <CourseForWhom />
 
-      {/* Skills covered */}
-      <CourseSkillsSection courseSlug={slug} />
-
       {/* Curriculum */}
       <section id="curriculum" className="bg-zinc-950 px-4 py-20">
         <div className="mx-auto max-w-4xl">
@@ -107,6 +104,9 @@ export default async function CourseDetailPage({ params }: Props) {
           />
         </div>
       </section>
+
+      {/* Skills landscape */}
+      <CourseSkillsSection />
 
       {/* Testimonials */}
       <CourseTestimonials />
