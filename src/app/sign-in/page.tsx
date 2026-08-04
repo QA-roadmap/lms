@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { GoogleSignInButton } from "@/components/auth/GoogleSignInButton";
+import { GitHubSignInButton } from "@/components/auth/GitHubSignInButton";
 import { SignInMethods } from "@/components/auth/SignInMethods";
 import Link from "next/link";
 import { Logo } from "@/components/Logo";
@@ -49,8 +50,9 @@ export default async function SignInPage({ searchParams }: Props) {
           </p>
         )}
 
-        <div className="mt-8">
+        <div className="mt-8 space-y-3">
           <GoogleSignInButton redirectTo="/academy" />
+          <GitHubSignInButton redirectTo="/academy" />
         </div>
 
         <div className="my-6 flex items-center gap-3">

@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import { GoogleSignInButton } from "@/components/auth/GoogleSignInButton";
+import { GitHubSignInButton } from "@/components/auth/GitHubSignInButton";
 import { SignUpForm } from "@/components/auth/SignUpForm";
 import Link from "next/link";
 import { Logo } from "@/components/Logo";
@@ -22,8 +23,9 @@ export default function SignUpPage() {
           Створіть акаунт, щоб отримати доступ до курсів
         </p>
 
-        <div className="mt-8">
+        <div className="mt-8 space-y-3">
           <GoogleSignInButton redirectTo="/academy" label="Зареєструватися через Google" />
+          <GitHubSignInButton redirectTo="/academy" label="Зареєструватися через GitHub" />
         </div>
 
         <div className="my-6 flex items-center gap-3">
