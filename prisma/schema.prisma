@@ -52,9 +52,11 @@ model Session {
 model VerificationToken {
   identifier String
   token      String   @unique
+  purpose    String
   expires    DateTime
 
   @@unique([identifier, token])
+  @@index([identifier, purpose])
 }
 
 model UserProgress {

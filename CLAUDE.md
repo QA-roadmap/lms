@@ -11,6 +11,16 @@ catalog and lesson content.
   to a custom path: `src/generated/prisma` (not the default `node_modules/.prisma`).
 - **Auth**: NextAuth v5 beta, **JWT strategy with manual DB upsert** — `PrismaAdapter` is
   incompatible with Prisma 7, do not reintroduce it. See `src/auth.ts` / `src/auth.config.ts`.
+  Providers: Google OAuth, plus two `Credentials` providers — `"credentials"` (email+password,
+  bcrypt) and `"magic-link"` (email+one-time token, no adapter — the provider's own `authorize`
+  validates and consumes the token via `src/lib/verification-tokens.ts`, which hashes tokens
+  into the pre-existing `VerificationToken` table keyed by `identifier` (email) + `purpose`
+  (`"magic-link" | "email-verify" | "password-reset"`)). Password sign-in is gated on
+  `User.emailVerified` — an unverified attempt throws a `CredentialsSignin` subclass with
+  `code: "email_not_verified"` (see `EmailNotVerifiedSignin` in `src/auth.ts`), which
+  `src/lib/auth-actions.ts` catches to surface a "resend verification email" action. All
+  transactional email (magic link, email verification, password reset) sends via Resend
+  (`src/lib/email.ts`, needs `RESEND_API_KEY` + `EMAIL_FROM` on a verified sending domain).
 - **Payments**: Monobank merchant API — Ukrainian payment gateway, not Stripe (Stripe deps exist
   but are unused legacy). Each course has a single one-time `priceUSD` in Sanity (buy once, own
   the course forever). Checkout at `/api/checkout` converts USD → UAH via `USD_TO_UAH_RATE`,
