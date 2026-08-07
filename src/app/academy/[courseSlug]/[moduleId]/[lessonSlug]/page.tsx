@@ -5,6 +5,7 @@ import { getLessonPreview, getCourseBySlugPreview } from "@/lib/sanity";
 import { redirect, notFound } from "next/navigation";
 import { Sidebar } from "@/components/academy/Sidebar";
 import { MarkCompleteButton } from "@/components/academy/MarkCompleteButton";
+import { PresentationViewer } from "@/components/academy/PresentationViewer";
 import { PortableTextContent } from "@/components/PortableTextContent";
 import { Lock } from "lucide-react";
 import Link from "next/link";
@@ -112,9 +113,7 @@ export default async function LessonPage({ params }: Props) {
                 )}
               </>
             ) : lesson.presentationUrl ? (
-              <div className="mt-6 aspect-video overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900">
-                <iframe src={lesson.presentationUrl} className="h-full w-full" />
-              </div>
+              <PresentationViewer url={lesson.presentationUrl} />
             ) : null}
 
             <div className="mx-auto max-w-4xl">
