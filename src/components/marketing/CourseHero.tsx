@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { BookOpen, Clock, Users, Star } from "lucide-react";
 import type { SanityCourse } from "@/types/sanity";
-import { courseLessonCount } from "@/lib/courses";
+import { courseLessonCount, getCourseDiscount } from "@/lib/courses";
 
 type Props = {
   course: SanityCourse;
@@ -22,6 +22,7 @@ function totalDurationMinutes(course: SanityCourse): number {
 
 export function CourseHero({ course }: Props) {
   const isAvailable = course.status === "available";
+  const discount = getCourseDiscount(course);
   const lessonCount = courseLessonCount(course);
   const durationMin = totalDurationMinutes(course);
   const durationHours = durationMin > 0 ? Math.round(durationMin / 60) : null;
@@ -56,11 +57,20 @@ export function CourseHero({ course }: Props) {
           {/* Left: content */}
           <div className="animate-fade-up">
             {/* Badge */}
-            <div className="mb-5 inline-flex items-center gap-2 rounded-full border border-blue-500/30 bg-blue-500/10 px-3.5 py-1.5">
-              <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-blue-400" />
-              <span className="text-xs font-medium text-blue-400">
-                {isAvailable ? "Доступний зараз" : "Скоро відкриється"}
-              </span>
+            <div className="mb-5 flex flex-wrap items-center gap-2">
+              <div className="inline-flex items-center gap-2 rounded-full border border-blue-500/30 bg-blue-500/10 px-3.5 py-1.5">
+                <span className="h-1.5 w-1.5 animate-pulse rounded-full bg-blue-400" />
+                <span className="text-xs font-medium text-blue-400">
+                  {isAvailable ? "Доступний зараз" : "Скоро відкриється"}
+                </span>
+              </div>
+              {isAvailable && discount && discount.discountPct > 0 && (
+                <div className="inline-flex items-center gap-1.5 rounded-full bg-blue-600 px-3.5 py-1.5">
+                  <span className="text-xs font-bold uppercase tracking-wide text-white">
+                    Знижка {discount.discountPct}%
+                  </span>
+                </div>
+              )}
             </div>
 
             <h1 className="text-4xl font-bold tracking-tight text-white sm:text-5xl sm:leading-tight">
@@ -111,7 +121,16 @@ export function CourseHero({ course }: Props) {
                     href="#pricing"
                     className="inline-flex items-center gap-2 rounded-xl bg-blue-600 px-6 py-3 text-sm font-semibold text-white shadow-lg shadow-blue-600/25 transition-all hover:bg-blue-500 hover:shadow-blue-500/30"
                   >
-                    {course.priceUSD !== undefined ? `Отримати доступ · $${course.priceUSD}` : "Отримати доступ"}
+                    {course.priceUSD !== undefined ? (
+                      <>
+                        Отримати доступ · ${course.priceUSD}
+                        {discount && discount.discountPct > 0 && (
+                          <span className="text-blue-200 line-through">${discount.originalPrice}</span>
+                        )}
+                      </>
+                    ) : (
+                      "Отримати доступ"
+                    )}
                   </a>
                   <a
                     href="#curriculum"
@@ -184,9 +203,12 @@ export function CourseHero({ course }: Props) {
               {isAvailable && course.priceUSD !== undefined && (
                 <a
                   href="#pricing"
-                  className="mt-5 block w-full rounded-xl bg-blue-600 py-3 text-center text-sm font-semibold text-white shadow-md shadow-blue-600/30 transition-colors hover:bg-blue-500"
+                  className="mt-5 flex w-full items-center justify-center gap-2 rounded-xl bg-blue-600 py-3 text-center text-sm font-semibold text-white shadow-md shadow-blue-600/30 transition-colors hover:bg-blue-500"
                 >
                   Отримати доступ · ${course.priceUSD}
+                  {discount && discount.discountPct > 0 && (
+                    <span className="text-blue-200 line-through">${discount.originalPrice}</span>
+                  )}
                 </a>
               )}
             </div>

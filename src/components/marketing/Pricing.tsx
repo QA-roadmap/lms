@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { CheckCircle, Zap, Shield, Clock } from "lucide-react";
 import type { SanityCourse } from "@/types/sanity";
+import { getCourseDiscount } from "@/lib/courses";
 
 const FEATURES = [
   "Миттєвий доступ до всіх уроків — без очікування",
@@ -24,10 +25,9 @@ export function Pricing({ course, hasPurchased }: Props) {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
 
-  if (course.priceUSD === undefined) return null;
-  const price = course.priceUSD;
-  const originalPrice = course.compareAtPriceUSD ?? Math.ceil((price * 1.52) / 10) * 10;
-  const discountPct = Math.round((1 - price / originalPrice) * 100);
+  const discount = getCourseDiscount(course);
+  if (!discount) return null;
+  const { price, originalPrice, discountPct } = discount;
   const uahPrice = Math.round(price * 41);
 
   async function handleCheckout() {
