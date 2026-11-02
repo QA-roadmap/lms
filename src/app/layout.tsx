@@ -8,6 +8,8 @@ import { ThemeProvider } from "@/components/ThemeProvider";
 import { SITE_NAME, SITE_URL } from "@/lib/seo";
 
 const GTM_ID = process.env.NEXT_PUBLIC_GTM_ID;
+// Meta Business Manager → Brand Safety → Domains → "Meta-tag verification" code.
+const FB_DOMAIN_VERIFICATION = process.env.NEXT_PUBLIC_FB_DOMAIN_VERIFICATION;
 
 const geistSans = Geist({
   variable: "--font-geist-sans",
@@ -43,6 +45,9 @@ export const metadata: Metadata = {
     title: DEFAULT_TITLE,
     description: DEFAULT_DESCRIPTION,
   },
+  ...(FB_DOMAIN_VERIFICATION && {
+    other: { "facebook-domain-verification": FB_DOMAIN_VERIFICATION },
+  }),
 };
 
 export default async function RootLayout({
